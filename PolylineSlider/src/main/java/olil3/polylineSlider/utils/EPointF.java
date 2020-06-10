@@ -19,11 +19,6 @@ public class EPointF {
         this.y = y;
     }
 
-    public EPointF(final int[] intArray) {
-        this.x = intArray[0];
-        this.y = intArray[1];
-    }
-
     public float getX() {
         return x;
     }
