@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="invalid_number_of_data_points">Number of data points should be greater than or equal to one!</string>
+</resources>

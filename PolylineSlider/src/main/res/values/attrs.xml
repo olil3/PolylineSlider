@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="PolylineSlider">
+        <attr name="number_of_data_points" format="integer" />
+        <attr name="is_slider_track_visible" format="enum">
+            <enum name="NO" value="0" />
+            <enum name="YES" value="1" />
+        </attr>
+        <attr name="thumb_color" format="color" />
+    </declare-styleable>
+</resources>
