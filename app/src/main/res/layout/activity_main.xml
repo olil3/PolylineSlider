@@ -24,6 +24,6 @@
         app:layout_constraintBottom_toTopOf="@+id/textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:number_of_data_points="24" />
+        app:number_of_data_points="5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -20,18 +20,10 @@ class PolylineSlider : RelativeLayout {
     private var mNumberOfDataPoints = 0
     private var sliderAlphaValue: Int? = 0
     private var mThumbColor: Int = 0
-    private lateinit var mSliderWrapperViewIDs: IntArray
-    private lateinit var mSliderThumbColor: PorterDuffColorFilter
-    private val mThumbCoordinateList: HashMap<Int, EPointF> = hashMapOf()
-    private var ySliderThumbPos: Float = 0.0f
-    private val bezierPathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var isBaseUIInitialized = false
     private var viewWidth = 0
     private var viewHeight = 0
-    private lateinit var mScrollViewRelativeLayout: RelativeLayout
     private var mSliderSpacingWidth: Int = 0
-    private val mGradientPath = Path()
-    private val mGradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private var mGradientColor: Int = 0
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
@@ -99,6 +91,15 @@ class PolylineSlider : RelativeLayout {
     private inner class PolylineSliderGraph(
         mContext: Context
     ) : HorizontalScrollView(mContext) {
+
+        private lateinit var mSliderWrapperViewIDs: IntArray
+        private lateinit var mSliderThumbColor: PorterDuffColorFilter
+        private val mThumbCoordinateList: HashMap<Int, EPointF> = hashMapOf()
+        private var ySliderThumbPos: Float = 0.0f
+        private val bezierPathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private val mGradientPath = Path()
+        private val mGradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+        private lateinit var mScrollViewRelativeLayout: RelativeLayout
 
         init {
             isSmoothScrollingEnabled = true
