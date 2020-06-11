@@ -11,20 +11,19 @@ import android.widget.RelativeLayout
 import android.widget.SeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-import olil3.polylineSlider.utils.EPointF
-import olil3.polylineSlider.utils.PolyBezierPathUtil
 import kotlin.math.abs
 
 class PolylineSlider : RelativeLayout {
     private var mPolylineSliderGraph: PolylineSliderGraph
     private var mNumberOfDataPoints = 0
-    private var sliderAlphaValue: Int? = 0
+    private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
     private var isBaseUIInitialized = false
     private var viewWidth = 0
     private var viewHeight = 0
     private var mSliderSpacingWidth: Int = 0
     private var mGradientColor: Int = 0
+    private lateinit var mSliderWrapperViewIDs: IntArray
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -92,7 +91,6 @@ class PolylineSlider : RelativeLayout {
         mContext: Context
     ) : HorizontalScrollView(mContext) {
 
-        private lateinit var mSliderWrapperViewIDs: IntArray
         private lateinit var mSliderThumbColor: PorterDuffColorFilter
         private val mThumbCoordinateList: HashMap<Int, EPointF> = hashMapOf()
         private var ySliderThumbPos: Float = 0.0f
@@ -135,7 +133,7 @@ class PolylineSlider : RelativeLayout {
                 mSlider.max = 100
                 mSlider.progress = 50
                 mSlider.splitTrack = false
-                mSlider.progressDrawable.alpha = sliderAlphaValue!!
+                mSlider.progressDrawable.alpha = 255
                 mSlider.thumb.colorFilter = mSliderThumbColor
                 mSlider.progressDrawable.colorFilter = mSliderThumbColor
 
@@ -160,6 +158,7 @@ class PolylineSlider : RelativeLayout {
 
                 })
 
+                mSliderWrapper.tag = mSlider
                 mSliderWrapper.addView(mSlider)
 
                 val sliderPositioningParams =
@@ -202,7 +201,10 @@ class PolylineSlider : RelativeLayout {
                 for (i in 0 until mNumberOfDataPoints) {
                     mListOfEPointFs.add(mThumbCoordinateList[mSliderWrapperViewIDs[i]]!!)
                 }
-                mListOfEPointFs.add(0, EPointF(0.0f, ySliderThumbPos))
+                mListOfEPointFs.add(
+                    0,
+                    EPointF(0.0f, ySliderThumbPos)
+                )
                 mListOfEPointFs.add(
                     EPointF(
                         this.computeHorizontalScrollRange().toFloat(),

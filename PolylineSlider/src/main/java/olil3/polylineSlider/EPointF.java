@@ -1,4 +1,4 @@
-package olil3.polylineSlider.utils;
+package olil3.polylineSlider;
 
 /**
  * This segment of the code is authored by:
@@ -9,7 +9,7 @@ package olil3.polylineSlider.utils;
  * This code has been slightly modified and adapted for the use of this project.
  * API inspired by the Apache Commons Math Vector2D class.
  */
-public class EPointF {
+class EPointF {
 
     private final float x;
     private final float y;

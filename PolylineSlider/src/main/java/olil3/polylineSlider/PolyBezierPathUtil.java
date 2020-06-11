@@ -1,4 +1,4 @@
-package olil3.polylineSlider.utils;
+package olil3.polylineSlider;
 
 import android.graphics.Path;
 
@@ -6,7 +6,8 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-public final class PolyBezierPathUtil {
+
+final class PolyBezierPathUtil {
 
     /**
      * This segment of this library is authored by:
