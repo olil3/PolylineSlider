@@ -7,5 +7,6 @@
             <enum name="YES" value="1" />
         </attr>
         <attr name="thumb_color" format="color" />
+        <attr name="gradient_color" format="color" />
     </declare-styleable>
 </resources>

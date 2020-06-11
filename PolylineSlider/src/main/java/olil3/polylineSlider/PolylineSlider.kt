@@ -29,6 +29,10 @@ class PolylineSlider : RelativeLayout {
     private var viewWidth = 0
     private var viewHeight = 0
     private lateinit var mScrollViewRelativeLayout: RelativeLayout
+    private var mSliderSpacingWidth: Int = 0
+    private val mGradientPath = Path()
+    private val mGradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var mGradientColor: Int = 0
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -52,6 +56,11 @@ class PolylineSlider : RelativeLayout {
                     attributes.getInt(R.styleable.PolylineSlider_is_slider_track_visible, 0)
                 mThumbColor =
                     attributes.getInt(R.styleable.PolylineSlider_thumb_color, Color.MAGENTA)
+                mGradientColor =
+                    attributes.getColor(
+                        R.styleable.PolylineSlider_gradient_color,
+                        Color.rgb(238, 130, 238)
+                    )
             } catch (error: Exception) {
                 Log.e("PolylineSlider init err", error.message!!)
                 throw error
@@ -71,6 +80,7 @@ class PolylineSlider : RelativeLayout {
     }
 
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
+
     constructor(mContext: Context) : this(mContext, null, 0)
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
@@ -79,6 +89,7 @@ class PolylineSlider : RelativeLayout {
             viewHeight = abs(t - b)
             viewWidth = abs(r - l)
 
+            mSliderSpacingWidth = mPolylineSliderGraph.getSliderSpacing(mNumberOfDataPoints)
             mPolylineSliderGraph.initializeBaseUI()
             isBaseUIInitialized = true
             invalidate()
@@ -151,7 +162,10 @@ class PolylineSlider : RelativeLayout {
                 mSliderWrapper.addView(mSlider)
 
                 val sliderPositioningParams =
-                    RelativeLayout.LayoutParams(150, ViewGroup.LayoutParams.MATCH_PARENT)
+                    RelativeLayout.LayoutParams(
+                        mSliderSpacingWidth,
+                        ViewGroup.LayoutParams.MATCH_PARENT
+                    )
                 if (sliderWrapperPos != 0) {
                     sliderPositioningParams.addRule(
                         RIGHT_OF,
@@ -194,8 +208,18 @@ class PolylineSlider : RelativeLayout {
                         ySliderThumbPos
                     )
                 )
-
-                PolyBezierPathUtil().computePathThroughKnots(mListOfEPointFs)
+                val pathToReturn = PolyBezierPathUtil().computePathThroughKnots(mListOfEPointFs)
+                mGradientPath.set(pathToReturn)
+                mGradientPaint.shader = LinearGradient(
+                    0f,
+                    0f,
+                    0f,
+                    viewHeight.toFloat(),
+                    mGradientColor,
+                    Color.TRANSPARENT,
+                    Shader.TileMode.MIRROR
+                )
+                pathToReturn
             } else {
                 null
             }
@@ -205,7 +229,23 @@ class PolylineSlider : RelativeLayout {
             super.onDraw(canvas)
             val pathToDraw = getBezierPathForThumbs()
             if (pathToDraw != null) {
+                mGradientPath.lineTo(
+                    this.computeHorizontalScrollRange().toFloat(),
+                    viewHeight.toFloat()
+                )
+                mGradientPath.lineTo(0.0f, viewHeight.toFloat())
+                mGradientPath.lineTo(0.0f, ySliderThumbPos)
+                canvas?.drawPath(mGradientPath, mGradientPaint)
                 canvas?.drawPath(pathToDraw, bezierPathPaint)
+            }
+        }
+
+        fun getSliderSpacing(numberOfSliders: Int): Int {
+            val minimumNumberOfSlidersInFocus = 5
+            return if (numberOfSliders >= minimumNumberOfSlidersInFocus) {
+                (viewWidth / minimumNumberOfSlidersInFocus)
+            } else {
+                (viewWidth / numberOfSliders)
             }
         }
     }
