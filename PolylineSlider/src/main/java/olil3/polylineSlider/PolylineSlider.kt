@@ -17,6 +17,18 @@ import kotlin.math.abs
 
 class PolylineSlider : RelativeLayout {
     private var mPolylineSliderGraph: PolylineSliderGraph
+    private var mNumberOfDataPoints = 0
+    private var sliderAlphaValue: Int? = 0
+    private var mThumbColor: Int = 0
+    private lateinit var mSliderWrapperViewIDs: IntArray
+    private lateinit var mSliderThumbColor: PorterDuffColorFilter
+    private val mThumbCoordinateList: HashMap<Int, EPointF> = hashMapOf()
+    private var ySliderThumbPos: Float = 0.0f
+    private val bezierPathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var isBaseUIInitialized = false
+    private var viewWidth = 0
+    private var viewHeight = 0
+    private lateinit var mScrollViewRelativeLayout: RelativeLayout
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -24,11 +36,7 @@ class PolylineSlider : RelativeLayout {
         defStyleAttr
     ) {
         /* As this layout acts as a housing for multiple subviews, disable drawing to avoid misuse of resources. */
-        setWillNotDraw(false)
-
-        var mNumberOfDataPoints = 2
-        var sliderAlphaValue: Int? = 0
-        var mThumbColor: Int = Color.MAGENTA
+        setWillNotDraw(true)
 
         if (attributeSet != null) {
             val attributes = mContext.obtainStyledAttributes(
@@ -39,7 +47,7 @@ class PolylineSlider : RelativeLayout {
             )
             try {
                 mNumberOfDataPoints =
-                    attributes.getInt(R.styleable.PolylineSlider_number_of_data_points, 2)
+                    attributes.getInt(R.styleable.PolylineSlider_number_of_data_points, 1)
                 sliderAlphaValue =
                     attributes.getInt(R.styleable.PolylineSlider_is_slider_track_visible, 0)
                 mThumbColor =
@@ -56,11 +64,7 @@ class PolylineSlider : RelativeLayout {
             }
 
         }
-
         mPolylineSliderGraph = PolylineSliderGraph(
-            mNumberOfDataPoints,
-            sliderAlphaValue,
-            mThumbColor,
             mContext
         )
         this.addView(mPolylineSliderGraph)
@@ -69,25 +73,21 @@ class PolylineSlider : RelativeLayout {
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
     constructor(mContext: Context) : this(mContext, null, 0)
 
-    private class PolylineSliderGraph(
-        mNumberOfDataPts: Int,
-        sliderAlphaVal: Int?,
-        mThumbClr: Int,
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+        if (!isBaseUIInitialized) {
+            viewHeight = abs(t - b)
+            viewWidth = abs(r - l)
+
+            mPolylineSliderGraph.initializeBaseUI()
+            isBaseUIInitialized = true
+            invalidate()
+        }
+    }
+
+    private inner class PolylineSliderGraph(
         mContext: Context
     ) : HorizontalScrollView(mContext) {
-
-        private lateinit var mSliderWrapperViewIDs: IntArray
-        private var mNumberOfDataPoints: Int = mNumberOfDataPts
-        private var mThumbColor: Int = mThumbClr
-        private lateinit var mSliderThumbColor: PorterDuffColorFilter
-        private var sliderAlphaValue: Int? = sliderAlphaVal
-        private val mThumbCoordinateList: HashMap<Int, EPointF> = hashMapOf()
-        private var ySliderThumbPos: Float = 0.0f
-        private val bezierPathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-        private var isBaseUIInitialized = false
-        private var viewWidth = 0
-        private var viewHeight = 0
-        private lateinit var mScrollViewRelativeLayout: RelativeLayout
 
         init {
             isSmoothScrollingEnabled = true
@@ -108,7 +108,7 @@ class PolylineSlider : RelativeLayout {
             mSliderWrapperViewIDs = IntArray(mNumberOfDataPoints)
         }
 
-        private fun initializeBaseUI() {
+        fun initializeBaseUI() {
             mScrollViewRelativeLayout =
                 findViewById(R.id.polylineRelativeLayout)
 
@@ -187,6 +187,13 @@ class PolylineSlider : RelativeLayout {
                 for (i in 0 until mNumberOfDataPoints) {
                     mListOfEPointFs.add(mThumbCoordinateList[mSliderWrapperViewIDs[i]]!!)
                 }
+                mListOfEPointFs.add(0, EPointF(0.0f, ySliderThumbPos))
+                mListOfEPointFs.add(
+                    EPointF(
+                        this.computeHorizontalScrollRange().toFloat(),
+                        ySliderThumbPos
+                    )
+                )
 
                 PolyBezierPathUtil().computePathThroughKnots(mListOfEPointFs)
             } else {
@@ -199,17 +206,6 @@ class PolylineSlider : RelativeLayout {
             val pathToDraw = getBezierPathForThumbs()
             if (pathToDraw != null) {
                 canvas?.drawPath(pathToDraw, bezierPathPaint)
-            }
-        }
-
-        override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-            super.onLayout(changed, l, t, r, b)
-            if (!isBaseUIInitialized) {
-                viewHeight = abs(t - b)
-                viewWidth = abs(r - l)
-                initializeBaseUI()
-                isBaseUIInitialized = true
-                invalidate()
             }
         }
     }
