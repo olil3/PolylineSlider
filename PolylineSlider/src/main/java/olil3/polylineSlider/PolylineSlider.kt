@@ -10,6 +10,9 @@ import kotlin.math.abs
 
 class PolylineSlider : RelativeLayout {
     private var mPolylineSliderGraph: PolylineSliderGraph
+    private var mXAxis: xAxis
+    private var mSliderRelativeLayout: RelativeLayout
+    private var mXAxisRelativeLayout: RelativeLayout
     private var mNumberOfDataPoints = 0
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
@@ -22,6 +25,10 @@ class PolylineSlider : RelativeLayout {
         attributeSet,
         defStyleAttr
     ) {
+        View.inflate(context, R.layout.polyline_slider, this)
+        mSliderRelativeLayout = findViewById(R.id.slider_graph)
+        mXAxisRelativeLayout = findViewById(R.id.slider_x_axis)
+
         /* As this layout acts as a housing for multiple subviews, disable drawing to avoid misuse of resources. */
         setWillNotDraw(true)
 
@@ -64,7 +71,15 @@ class PolylineSlider : RelativeLayout {
             mGradientColor
         )
         mPolylineSliderGraph.id = View.generateViewId()
-        this.addView(mPolylineSliderGraph)
+        mSliderRelativeLayout.addView(mPolylineSliderGraph)
+        mXAxis = xAxis(mContext, mNumberOfDataPoints, "Hrs")
+        mXAxisRelativeLayout.addView(mXAxis)
+        mPolylineSliderGraph.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            mXAxis.scrollX = scrollX
+            mXAxis.scrollY = scrollY
+        }
+
+
     }
 
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
@@ -79,6 +94,8 @@ class PolylineSlider : RelativeLayout {
             mPolylineSliderGraph.viewWidth = viewWidth
             mPolylineSliderGraph.mSliderSpacingWidth = getSliderSpacing(mNumberOfDataPoints)
             mPolylineSliderGraph.initializeBaseUI()
+            mXAxis.mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+            mXAxis.initializeBaseUi()
             isBaseUIInitialized = true
             invalidate()
         }
