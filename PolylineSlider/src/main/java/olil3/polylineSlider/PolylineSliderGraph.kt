@@ -116,7 +116,7 @@ internal class PolylineSliderGraph(
             mSliderWrapper.addView(mSlider)
             val relParams = RelativeLayout.LayoutParams(viewWidth, viewHeight - 50)
             mSliderRelativeLayout.addView(mSliderWrapper, relParams)
-
+            //mTextBox.setPadding(0, 100, 0, 0)
             val textRelParams = RelativeLayout.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT
@@ -195,7 +195,6 @@ internal class PolylineSliderGraph(
     }
 
     override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
         val pathToDraw = getBezierPathForThumbs()
         if (pathToDraw != null) {
             mGradientPath.lineTo(
@@ -204,8 +203,16 @@ internal class PolylineSliderGraph(
             )
             mGradientPath.lineTo(0.0f, viewHeight.toFloat())
             mGradientPath.lineTo(0.0f, ySliderThumbPos)
+
+            canvas?.clipRect(
+                0.0f + this.scrollX,
+                0.0f,
+                viewWidth.toFloat() + this.scrollX,
+                (viewHeight).toFloat()
+            )
             canvas?.drawPath(mGradientPath, mGradientPaint)
             canvas?.drawPath(pathToDraw, bezierPathPaint)
+            super.onDraw(canvas)
         }
     }
 }
