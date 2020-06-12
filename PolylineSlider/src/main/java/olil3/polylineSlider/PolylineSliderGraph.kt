@@ -33,7 +33,6 @@ internal class PolylineSliderGraph(
     var mSliderSpacingWidth: Int = 0
     private var mGradientColor: Int = 0
     private lateinit var mSliderWrapperViewIDs: IntArray
-    var mScrollRange: Int = 0
 
     init {
         overScrollMode = View.OVER_SCROLL_NEVER
@@ -180,11 +179,11 @@ internal class PolylineSliderGraph(
                 this.computeHorizontalScrollRange().toFloat(),
                 viewHeight.toFloat()
             )
+            canvas?.clipRect(this.scrollX, 0, viewWidth + this.scrollX, viewHeight)
             mGradientPath.lineTo(0.0f, viewHeight.toFloat())
             mGradientPath.lineTo(0.0f, ySliderThumbPos)
             canvas?.drawPath(mGradientPath, mGradientPaint)
             canvas?.drawPath(pathToDraw, bezierPathPaint)
-            mScrollRange = this.computeHorizontalScrollRange()
         }
     }
 }
