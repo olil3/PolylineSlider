@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
+import android.view.View
 import android.widget.RelativeLayout
 import kotlin.math.abs
 
@@ -62,6 +63,7 @@ class PolylineSlider : RelativeLayout {
             mThumbColor,
             mGradientColor
         )
+        mPolylineSliderGraph.id = View.generateViewId()
         this.addView(mPolylineSliderGraph)
     }
 
@@ -74,7 +76,7 @@ class PolylineSlider : RelativeLayout {
         if (!isBaseUIInitialized) {
             mPolylineSliderGraph.viewHeight = abs(t - b)
             viewWidth = abs(r - l)
-
+            mPolylineSliderGraph.viewWidth = viewWidth
             mPolylineSliderGraph.mSliderSpacingWidth = getSliderSpacing(mNumberOfDataPoints)
             mPolylineSliderGraph.initializeBaseUI()
             isBaseUIInitialized = true

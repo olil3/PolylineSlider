@@ -60,24 +60,24 @@ internal class PolyBezierPathUtil {
     ): Array<EPointF?> {
         val result = arrayOfNulls<EPointF>(2 * n)
         val target = constructTargetVector(n, knots)
-        val lowerDiag = constructLowerDiagonalVector(n - 1)
-        val mainDiag = constructMainDiagonalVector(n)
-        val upperDiag = constructUpperDiagonalVector(n - 1)
+        val lowerDiagonal = constructLowerDiagonalVector(n - 1)
+        val mainDiagonal = constructMainDiagonalVector(n)
+        val upperDiagonal = constructUpperDiagonalVector(n - 1)
         val newTarget = arrayOfNulls<EPointF>(n)
-        val newUpperDiag = arrayOfNulls<Float>(n - 1)
+        val newUpperDiagonal = arrayOfNulls<Float>(n - 1)
 
         // forward sweep for control points c_i,0:
-        newUpperDiag[0] = upperDiag[0]!! / mainDiag[0]!!
-        newTarget[0] = target[0]!!.scaleBy(1 / mainDiag[0]!!)
+        newUpperDiagonal[0] = upperDiagonal[0]!! / mainDiagonal[0]!!
+        newTarget[0] = target[0]!!.scaleBy(1 / mainDiagonal[0]!!)
         for (i in 1 until n - 1) {
-            newUpperDiag[i] = upperDiag[i]!! /
-                    (mainDiag[i]!! - lowerDiag[i - 1]!! * newUpperDiag[i - 1]!!)
+            newUpperDiagonal[i] = upperDiagonal[i]!! /
+                    (mainDiagonal[i]!! - lowerDiagonal[i - 1]!! * newUpperDiagonal[i - 1]!!)
         }
         for (i in 1 until n) {
             val targetScale = 1 /
-                    (mainDiag[i]!! - lowerDiag[i - 1]!! * newUpperDiag[i - 1]!!)
+                    (mainDiagonal[i]!! - lowerDiagonal[i - 1]!! * newUpperDiagonal[i - 1]!!)
             newTarget[i] =
-                target[i]!!.minus(newTarget[i - 1]!!.scaleBy(lowerDiag[i - 1]!!)).scaleBy(
+                target[i]!!.minus(newTarget[i - 1]!!.scaleBy(lowerDiagonal[i - 1]!!)).scaleBy(
                     targetScale
                 )
         }
@@ -85,7 +85,7 @@ internal class PolyBezierPathUtil {
         // backward sweep for control points c_i,0:
         result[n - 1] = newTarget[n - 1]
         for (i in n - 2 downTo 0) {
-            result[i] = newTarget[i]!!.minus(newUpperDiag[i]!!, result[i + 1]!!)
+            result[i] = newTarget[i]!!.minus(newUpperDiagonal[i]!!, result[i + 1]!!)
         }
 
         // calculate remaining control points c_i,1 directly:

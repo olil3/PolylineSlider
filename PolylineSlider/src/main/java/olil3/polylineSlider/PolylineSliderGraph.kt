@@ -2,11 +2,13 @@ package olil3.polylineSlider
 
 import android.content.Context
 import android.graphics.*
+import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.RelativeLayout
 import android.widget.SeekBar
+import android.widget.TextView
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
 
@@ -29,6 +31,7 @@ internal class PolylineSliderGraph(
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
     var viewHeight = 0
+    var viewWidth = 0
     var mSliderSpacingWidth: Int = 0
     private var mGradientColor: Int = 0
     private lateinit var mSliderWrapperViewIDs: IntArray
@@ -59,10 +62,18 @@ internal class PolylineSliderGraph(
     fun initializeBaseUI() {
         mScrollViewRelativeLayout =
             findViewById(R.id.polylineRelativeLayout)
+        var previousRelID = 0
 
         for (sliderWrapperPos in 0 until mNumberOfDataPoints) {
             val mSlider = VerticalSeekBar(context)
             val mSliderWrapper = VerticalSeekBarWrapper(context)
+            val mSliderRelativeLayout = RelativeLayout(context)
+            val mTextBox = TextView(context)
+
+            mSliderRelativeLayout.id = View.generateViewId()
+            mTextBox.text = ((sliderWrapperPos + 1).toString() + "Hrs")
+            mTextBox.gravity = Gravity.CENTER_HORIZONTAL
+            mTextBox.textSize = 15f
 
             mSliderWrapper.id = View.generateViewId()
             mSliderWrapperViewIDs[sliderWrapperPos] = mSliderWrapper.id
@@ -91,13 +102,27 @@ internal class PolylineSliderGraph(
                     invalidate()
                 }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    mTextBox.typeface = Typeface.DEFAULT_BOLD
+                }
 
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    mTextBox.typeface = Typeface.DEFAULT
+                }
             })
 
             mSliderWrapper.tag = mSlider
+            mSlider.tag = mSliderRelativeLayout
             mSliderWrapper.addView(mSlider)
+            val relParams = RelativeLayout.LayoutParams(viewWidth, viewHeight - 50)
+            mSliderRelativeLayout.addView(mSliderWrapper, relParams)
+
+            val textRelParams = RelativeLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+            textRelParams.addRule(RelativeLayout.BELOW, mSliderWrapper.id)
+            mSliderRelativeLayout.addView(mTextBox, textRelParams)
 
             val sliderPositioningParams =
                 RelativeLayout.LayoutParams(
@@ -107,26 +132,28 @@ internal class PolylineSliderGraph(
             if (sliderWrapperPos != 0) {
                 sliderPositioningParams.addRule(
                     RelativeLayout.RIGHT_OF,
-                    mSliderWrapperViewIDs[sliderWrapperPos - 1]
+                    previousRelID
                 )
-                mScrollViewRelativeLayout.addView(mSliderWrapper, sliderPositioningParams)
+                mScrollViewRelativeLayout.addView(mSliderRelativeLayout, sliderPositioningParams)
 
             } else {
-                mScrollViewRelativeLayout.addView(mSliderWrapper, sliderPositioningParams)
+                mScrollViewRelativeLayout.addView(mSliderRelativeLayout, sliderPositioningParams)
                 mSliderWrapper.post {
                     ySliderThumbPos =
                         getThumbXYCoordinatesAsEPointF(mSlider).y // Get Y - element
                 }
             }
+            previousRelID = mSliderRelativeLayout.id
         }
         invalidate()
     }
 
     private fun getThumbXYCoordinatesAsEPointF(seekBarToFind: VerticalSeekBar): EPointF {
         val seekBarWrapper = seekBarToFind.parent as VerticalSeekBarWrapper
+        val seekBarRelativeLayout = seekBarToFind.tag as RelativeLayout
         val seekBarThumbBounds = seekBarToFind.thumb.bounds
         val xPos: Float =
-            seekBarWrapper.left + seekBarThumbBounds.exactCenterY() + ((seekBarWrapper.width - (seekBarToFind.paddingLeft * 1.1f)) / 2)
+            seekBarRelativeLayout.left + seekBarWrapper.left + seekBarThumbBounds.exactCenterY() + ((seekBarWrapper.width - (seekBarToFind.paddingLeft * 1.1f)) / 2)
         val yPos: Float =
             seekBarWrapper.bottom - seekBarThumbBounds.exactCenterX() - (seekBarThumbBounds.height() * 0.4f)
 
