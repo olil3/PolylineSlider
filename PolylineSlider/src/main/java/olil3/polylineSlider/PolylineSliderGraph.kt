@@ -3,10 +3,8 @@ package olil3.polylineSlider
 import android.content.Context
 import android.graphics.*
 import android.view.View
-import android.view.ViewGroup
 import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
-import android.widget.SeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
 
@@ -18,13 +16,13 @@ internal class PolylineSliderGraph(
     mGradientCol: Int
 
 ) : HorizontalScrollView(mContext) {
-    private lateinit var mSliderThumbColor: PorterDuffColorFilter
-    private val mThumbCoordinateList: HashMap<Int, EPointF> = hashMapOf()
-    private var ySliderThumbPos: Float = 0.0f
+    lateinit var mSliderThumbColor: PorterDuffColorFilter
+    val mThumbCoordinateList: HashMap<Int, EPointF> = hashMapOf()
+    var ySliderThumbPos: Float = 0.0f
     private val bezierPathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mGradientPath = Path()
     private val mGradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private lateinit var mScrollViewLinearLayout: LinearLayout
+    lateinit var mScrollViewLinearLayout: LinearLayout
     private var mNumberOfDataPoints = 0
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
@@ -32,7 +30,7 @@ internal class PolylineSliderGraph(
     var viewWidth = 0
     var mSliderSpacingWidth: Int = 0
     private var mGradientColor: Int = 0
-    private lateinit var mSliderWrapperViewIDs: IntArray
+    lateinit var mSliderWrapperViewIDs: IntArray
 
     init {
         mNumberOfDataPoints = mNumberOfDtPts
@@ -63,65 +61,7 @@ internal class PolylineSliderGraph(
         }
     }
 
-    fun initializeBaseUI() {
-        for (sliderWrapperPos in 0 until mNumberOfDataPoints) {
-            val mSliderWrapper = View.inflate(
-                context,
-                R.layout.vertical_seek_bar_item,
-                null
-            ) as VerticalSeekBarWrapper
-            val mSlider = mSliderWrapper.getChildAt(0) as VerticalSeekBar
-
-            mSliderWrapper.id = View.generateViewId()
-            mSliderWrapperViewIDs[sliderWrapperPos] = mSliderWrapper.id
-
-            mSlider.progressDrawable.alpha = sliderAlphaValue
-            mSlider.thumb.colorFilter = mSliderThumbColor
-            mSlider.progressDrawable.colorFilter = mSliderThumbColor
-
-            mSlider.post {
-                mThumbCoordinateList[mSliderWrapper.id] =
-                    getThumbXYCoordinatesAsEPointF(mSlider)
-            }
-
-            mSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
-                override fun onProgressChanged(
-                    seekBar: SeekBar?,
-                    progress: Int,
-                    fromUser: Boolean
-                ) {
-                    mThumbCoordinateList[mSliderWrapper.id] =
-                        getThumbXYCoordinatesAsEPointF(mSlider)
-                    invalidate()
-                }
-
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                }
-
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                }
-            })
-
-
-            val sliderPositioningParams =
-                LinearLayout.LayoutParams(
-                    mSliderSpacingWidth,
-                    ViewGroup.LayoutParams.MATCH_PARENT
-                )
-
-            if (sliderWrapperPos == 0) {
-                mSliderWrapper.post {
-                    ySliderThumbPos =
-                        getThumbXYCoordinatesAsEPointF(mSlider).y // Get Y - element
-                }
-
-            }
-            mScrollViewLinearLayout.addView(mSliderWrapper, sliderPositioningParams)
-        }
-        invalidate()
-    }
-
-    private fun getThumbXYCoordinatesAsEPointF(seekBarToFind: VerticalSeekBar): EPointF {
+    fun getThumbXYCoordinatesAsEPointF(seekBarToFind: VerticalSeekBar): EPointF {
         val seekBarWrapper = seekBarToFind.parent as VerticalSeekBarWrapper
         val seekBarThumbBounds = seekBarToFind.thumb.bounds
         val xPos: Float =
@@ -135,10 +75,7 @@ internal class PolylineSliderGraph(
     private fun getBezierPathForThumbs(): Path? {
         return if (mNumberOfDataPoints == mThumbCoordinateList.entries.size) {
             val mListOfEPointFs = arrayListOf<EPointF>()
-
-            for (i in 0 until mNumberOfDataPoints) {
-                mListOfEPointFs.add(mThumbCoordinateList[mSliderWrapperViewIDs[i]]!!)
-            }
+            mListOfEPointFs.addAll(mThumbCoordinateList.values)
             mListOfEPointFs.add(
                 0,
                 EPointF(0.0f, ySliderThumbPos)
@@ -166,6 +103,7 @@ internal class PolylineSliderGraph(
         }
     }
 
+    @Synchronized
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
         val pathToDraw = getBezierPathForThumbs()

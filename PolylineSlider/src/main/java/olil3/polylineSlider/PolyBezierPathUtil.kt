@@ -1,7 +1,6 @@
 package olil3.polylineSlider
 
 import android.graphics.Path
-import java.util.*
 
 internal class PolyBezierPathUtil {
     /**
@@ -10,10 +9,6 @@ internal class PolyBezierPathUtil {
      *
      *
      * Website: https://www.stkent.com/2015/07/03/building-smooth-paths-using-bezier-curves.html
-     *
-     *
-     *
-     *
      * This code has been slightly modified and adapted for the use of this project.
      *
      *
@@ -59,28 +54,29 @@ internal class PolyBezierPathUtil {
         knots: List<EPointF>
     ): Array<EPointF?> {
         val result = arrayOfNulls<EPointF>(2 * n)
-        val target = constructTargetVector(n, knots)
-        val lowerDiagonal = constructLowerDiagonalVector(n - 1)
-        val mainDiagonal = constructMainDiagonalVector(n)
-        val upperDiagonal = constructUpperDiagonalVector(n - 1)
         val newTarget = arrayOfNulls<EPointF>(n)
         val newUpperDiagonal = arrayOfNulls<Float>(n - 1)
 
         // forward sweep for control points c_i,0:
-        newUpperDiagonal[0] = upperDiagonal[0]!! / mainDiagonal[0]!!
-        newTarget[0] = target[0]!!.scaleBy(1 / mainDiagonal[0]!!)
+        newUpperDiagonal[0] = 0.5f
+        newTarget[0] = knots[0].plus(2f, knots[1]).scaleBy(0.5f)
+
         for (i in 1 until n - 1) {
-            newUpperDiagonal[i] = upperDiagonal[i]!! /
-                    (mainDiagonal[i]!! - lowerDiagonal[i - 1]!! * newUpperDiagonal[i - 1]!!)
-        }
-        for (i in 1 until n) {
-            val targetScale = 1 /
-                    (mainDiagonal[i]!! - lowerDiagonal[i - 1]!! * newUpperDiagonal[i - 1]!!)
+            newUpperDiagonal[i] = 1f /
+                    (4f - 1f * newUpperDiagonal[i - 1]!!)
             newTarget[i] =
-                target[i]!!.minus(newTarget[i - 1]!!.scaleBy(lowerDiagonal[i - 1]!!)).scaleBy(
-                    targetScale
-                )
+                knots[i].scaleBy(2f).plus(knots[i + 1]).scaleBy(2f)
+                    .minus(newTarget[i - 1]!!.scaleBy(1f)).scaleBy(
+                        1 /
+                                (4f - 1f * newUpperDiagonal[i - 1]!!)
+                    )
         }
+
+        newTarget[n - 1] =
+            knots[n - 1].scaleBy(8f).plus(knots[n]).minus(newTarget[n - 2]!!.scaleBy(2f)).scaleBy(
+                1 /
+                        (7f - 2f * newUpperDiagonal[n - 2]!!)
+            )
 
         // backward sweep for control points c_i,0:
         result[n - 1] = newTarget[n - 1]
@@ -93,44 +89,6 @@ internal class PolyBezierPathUtil {
             result[n + i] = knots[i + 1].scaleBy(2f).minus(result[i + 1]!!)
         }
         result[2 * n - 1] = knots[n].plus(result[n - 1]!!).scaleBy(0.5f)
-        return result
-    }
-
-    private fun constructTargetVector(
-        n: Int,
-        knots: List<EPointF>
-    ): Array<EPointF?> {
-        val result = arrayOfNulls<EPointF>(n)
-        result[0] = knots[0].plus(2f, knots[1])
-        for (i in 1 until n - 1) {
-            result[i] = knots[i].scaleBy(2f).plus(knots[i + 1]).scaleBy(2f)
-        }
-        result[result.size - 1] = knots[n - 1].scaleBy(8f).plus(knots[n])
-        return result
-    }
-
-    private fun constructLowerDiagonalVector(length: Int): Array<Float?> {
-        val result = arrayOfNulls<Float>(length)
-        for (i in 0 until result.size - 1) {
-            result[i] = 1f
-        }
-        result[result.size - 1] = 2f
-        return result
-    }
-
-    private fun constructMainDiagonalVector(n: Int): Array<Float?> {
-        val result = arrayOfNulls<Float>(n)
-        result[0] = 2f
-        for (i in 1 until result.size - 1) {
-            result[i] = 4f
-        }
-        result[result.size - 1] = 7f
-        return result
-    }
-
-    private fun constructUpperDiagonalVector(length: Int): Array<Float?> {
-        val result = arrayOfNulls<Float>(length)
-        Arrays.fill(result, 1f)
         return result
     }
 

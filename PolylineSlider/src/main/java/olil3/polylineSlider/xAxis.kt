@@ -7,9 +7,9 @@ import android.widget.HorizontalScrollView
 import android.widget.LinearLayout
 import android.widget.TextView
 
-class xAxis(mContext: Context, private var mNumberOfDataPoints: Int, private val mUnits: String) :
+class xAxis(mContext: Context, var mNumberOfDataPoints: Int, val mUnits: String) :
     HorizontalScrollView(mContext) {
-    private var mLinearLayout: LinearLayout = LinearLayout(context)
+    var mLinearLayout: LinearLayout = LinearLayout(context)
     var mSliderSpacing: Int = 0
 
     init {

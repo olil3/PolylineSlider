@@ -2,11 +2,17 @@ package olil3.polylineSlider
 
 import android.content.Context
 import android.graphics.Color
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
+import android.widget.SeekBar
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
+import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
 import kotlin.math.abs
 
 class PolylineSlider : ConstraintLayout {
@@ -20,6 +26,7 @@ class PolylineSlider : ConstraintLayout {
     private var isBaseUIInitialized = false
     private var viewWidth = 0
     private var mGradientColor: Int = 0
+    private var mSliderSpacing: Int = 0
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -97,18 +104,12 @@ class PolylineSlider : ConstraintLayout {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
         if (!isBaseUIInitialized) {
-            mPolylineSliderGraph.viewHeight = abs(t - b)
             viewWidth = abs(r - l)
-
+            mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+            initializeUI()
             mPolylineSliderGraph.viewWidth = viewWidth
-
-            mPolylineSliderGraph.mSliderSpacingWidth = getSliderSpacing(mNumberOfDataPoints)
-            mPolylineSliderGraph.initializeBaseUI()
-
-            mXAxis.mSliderSpacing = mPolylineSliderGraph.mSliderSpacingWidth
-            mXAxis.initializeBaseUi()
+            mPolylineSliderGraph.viewHeight = abs(t - b)
             isBaseUIInitialized = true
-            invalidate()
         }
     }
 
@@ -121,4 +122,69 @@ class PolylineSlider : ConstraintLayout {
         }
     }
 
+    private fun initializeUI() {
+        val textBoxLinearParams =
+            LinearLayout.LayoutParams(mSliderSpacing, 80)
+        val sliderPositioningParams =
+            LinearLayout.LayoutParams(
+                mSliderSpacing,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        @Synchronized
+        for (i in 0 until mNumberOfDataPoints) {
+            val mTextBox = View.inflate(context, R.layout.text_box, null) as TextView
+            val mSliderWrapper = View.inflate(
+                context,
+                R.layout.vertical_seek_bar_item,
+                null
+            ) as VerticalSeekBarWrapper
+            val mSlider = mSliderWrapper.getChildAt(0) as VerticalSeekBar
+
+            mTextBox.text = ((i + 1).toString() + "Hrs")
+            mXAxis.mLinearLayout.addView(mTextBox, textBoxLinearParams)
+
+            mSliderWrapper.id = View.generateViewId()
+            mPolylineSliderGraph.mSliderWrapperViewIDs[i] = mSliderWrapper.id
+
+            mSlider.progressDrawable.alpha = sliderAlphaValue
+            mSlider.thumb.colorFilter = mPolylineSliderGraph.mSliderThumbColor
+            mSlider.progressDrawable.colorFilter = mPolylineSliderGraph.mSliderThumbColor
+
+            mSlider.post {
+                mPolylineSliderGraph.mThumbCoordinateList[mSliderWrapper.id] =
+                    mPolylineSliderGraph.getThumbXYCoordinatesAsEPointF(mSlider)
+            }
+
+            mSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(
+                    seekBar: SeekBar?,
+                    progress: Int,
+                    fromUser: Boolean
+                ) {
+                    mPolylineSliderGraph.mThumbCoordinateList[mSliderWrapper.id] =
+                        mPolylineSliderGraph.getThumbXYCoordinatesAsEPointF(mSlider)
+                    mPolylineSliderGraph.invalidate()
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    mTextBox.typeface = Typeface.DEFAULT_BOLD
+                }
+
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    mTextBox.typeface = Typeface.DEFAULT
+                }
+            })
+
+            if (i == 0) {
+                mSliderWrapper.post {
+                    mPolylineSliderGraph.ySliderThumbPos =
+                        mPolylineSliderGraph.getThumbXYCoordinatesAsEPointF(mSlider).y // Get Y - element
+                }
+            }
+            mPolylineSliderGraph.mScrollViewLinearLayout.addView(
+                mSliderWrapper,
+                sliderPositioningParams
+            )
+        }
+    }
 }
