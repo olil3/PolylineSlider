@@ -27,6 +27,8 @@ class PolylineSlider : ConstraintLayout {
     private var viewWidth = 0
     private var mGradientColor: Int = 0
     private var mSliderSpacing: Int = 0
+    private var mTextBoxList = mutableListOf<TextView>()
+    private var mVerticalSeekBarWrapper = mutableListOf<VerticalSeekBarWrapper>()
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -95,66 +97,24 @@ class PolylineSlider : ConstraintLayout {
         mXAxis.setOnScrollChangeListener { _, scrollX, _, _, _ ->
             mPolylineSliderGraph.scrollX = scrollX
         }
-    }
 
-    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
-
-    constructor(mContext: Context) : this(mContext, null, 0)
-
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        super.onLayout(changed, l, t, r, b)
-        if (!isBaseUIInitialized) {
-            viewWidth = abs(r - l)
-            mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
-            initializeUI()
-            mPolylineSliderGraph.viewWidth = viewWidth
-            mPolylineSliderGraph.viewHeight = abs(t - b)
-            isBaseUIInitialized = true
-        }
-    }
-
-    private fun getSliderSpacing(numberOfSliders: Int): Int {
-        val minimumNumberOfSlidersInFocus = 8
-        return if (numberOfSliders >= minimumNumberOfSlidersInFocus) {
-            (viewWidth / minimumNumberOfSlidersInFocus)
-        } else {
-            (viewWidth / numberOfSliders)
-        }
-    }
-
-    private fun initializeUI() {
-        val textBoxLinearParams =
-            LinearLayout.LayoutParams(mSliderSpacing, 80)
-        val sliderPositioningParams =
-            LinearLayout.LayoutParams(
-                mSliderSpacing,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        @Synchronized
         for (i in 0 until mNumberOfDataPoints) {
             val mTextBox = View.inflate(context, R.layout.text_box, null) as TextView
+            mTextBox.text = ((i + 1).toString() + "Hrs")
+            mTextBoxList.add(mTextBox)
+
             val mSliderWrapper = View.inflate(
                 context,
                 R.layout.vertical_seek_bar_item,
                 null
             ) as VerticalSeekBarWrapper
             val mSlider = mSliderWrapper.getChildAt(0) as VerticalSeekBar
-
-            mTextBox.text = ((i + 1).toString() + "Hrs")
-            mXAxis.mLinearLayout.addView(mTextBox, textBoxLinearParams)
-
             mSliderWrapper.id = View.generateViewId()
             mPolylineSliderGraph.mSliderWrapperViewIDs[i] = mSliderWrapper.id
 
             mSlider.progressDrawable.alpha = sliderAlphaValue
             mSlider.thumb.colorFilter = mPolylineSliderGraph.mSliderThumbColor
             mSlider.progressDrawable.colorFilter = mPolylineSliderGraph.mSliderThumbColor
-
-            mSlider.post {
-                mPolylineSliderGraph.mThumbCoordinateList[mSliderWrapper.id] =
-                    mPolylineSliderGraph.getThumbXYCoordinatesAsEPointF(mSlider)
-            }
-
             mSlider.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
                     seekBar: SeekBar?,
@@ -174,6 +134,55 @@ class PolylineSlider : ConstraintLayout {
                     mTextBox.typeface = Typeface.DEFAULT
                 }
             })
+            mVerticalSeekBarWrapper.add(mSliderWrapper)
+        }
+    }
+
+    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
+
+    constructor(mContext: Context) : this(mContext, null, 0)
+
+    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        super.onLayout(changed, l, t, r, b)
+        if (!isBaseUIInitialized) {
+            viewWidth = abs(r - l)
+            mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+            attachUI()
+            mPolylineSliderGraph.viewWidth = viewWidth
+            mPolylineSliderGraph.viewHeight = abs(t - b)
+            isBaseUIInitialized = true
+        }
+    }
+
+    private fun getSliderSpacing(numberOfSliders: Int): Int {
+        val minimumNumberOfSlidersInFocus = 8
+        return if (numberOfSliders >= minimumNumberOfSlidersInFocus) {
+            (viewWidth / minimumNumberOfSlidersInFocus)
+        } else {
+            (viewWidth / numberOfSliders)
+        }
+    }
+
+    private fun attachUI() {
+        val textBoxLinearParams =
+            LinearLayout.LayoutParams(mSliderSpacing, 80)
+        val sliderPositioningParams =
+            LinearLayout.LayoutParams(
+                mSliderSpacing,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+
+        for (i in 0 until mNumberOfDataPoints) {
+            val mTextBox = mTextBoxList[i]
+            val mSliderWrapper = mVerticalSeekBarWrapper[i]
+            val mSlider = mSliderWrapper.getChildAt(0) as VerticalSeekBar
+
+            mXAxis.mLinearLayout.addView(mTextBox, textBoxLinearParams)
+
+            mSlider.post {
+                mPolylineSliderGraph.mThumbCoordinateList[mSliderWrapper.id] =
+                    mPolylineSliderGraph.getThumbXYCoordinatesAsEPointF(mSlider)
+            }
 
             if (i == 0) {
                 mSliderWrapper.post {

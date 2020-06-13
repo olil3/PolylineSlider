@@ -14,6 +14,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:number_of_data_points="24" />
+        app:number_of_data_points="26" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

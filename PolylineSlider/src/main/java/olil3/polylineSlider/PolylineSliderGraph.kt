@@ -28,7 +28,6 @@ internal class PolylineSliderGraph(
     private var mThumbColor: Int = 0
     var viewHeight = 0
     var viewWidth = 0
-    var mSliderSpacingWidth: Int = 0
     private var mGradientColor: Int = 0
     lateinit var mSliderWrapperViewIDs: IntArray
 
