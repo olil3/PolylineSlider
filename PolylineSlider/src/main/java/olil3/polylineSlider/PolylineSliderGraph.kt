@@ -35,12 +35,15 @@ internal class PolylineSliderGraph(
     private lateinit var mSliderWrapperViewIDs: IntArray
 
     init {
-        overScrollMode = View.OVER_SCROLL_NEVER
         isHorizontalScrollBarEnabled = false
         mNumberOfDataPoints = mNumberOfDtPts
         sliderAlphaValue = mSliderAlphaVal
         mThumbColor = mThumbClr
         mGradientColor = mGradientCol
+        setOnTouchListener { v, _ ->
+            v.performClick()
+            true
+        }
         objectInit(mContext)
     }
 

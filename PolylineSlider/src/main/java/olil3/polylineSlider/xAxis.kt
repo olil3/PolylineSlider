@@ -14,7 +14,9 @@ class xAxis(mContext: Context, private var mNumberOfDataPoints: Int, private val
     var mSliderSpacing: Int = 0
 
     init {
-        setWillNotDraw(true)
+        overScrollMode = View.OVER_SCROLL_NEVER
+        //scrollBarFadeDuration = 0
+        isScrollbarFadingEnabled = false
         this.addView(mLinearLayout)
     }
 
@@ -25,6 +27,7 @@ class xAxis(mContext: Context, private var mNumberOfDataPoints: Int, private val
             mTextBox.id = View.generateViewId()
             mTextBox.text = ((i + 1).toString() + mUnits)
             mTextBox.gravity = Gravity.CENTER_HORIZONTAL
+
             val textBoxLinearParams =
                 RelativeLayout.LayoutParams(mSliderSpacing, ViewGroup.LayoutParams.MATCH_PARENT)
 

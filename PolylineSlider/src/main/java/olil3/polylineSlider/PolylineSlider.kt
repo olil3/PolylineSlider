@@ -74,12 +74,10 @@ class PolylineSlider : RelativeLayout {
         mSliderRelativeLayout.addView(mPolylineSliderGraph)
         mXAxis = xAxis(mContext, mNumberOfDataPoints, "Hrs")
         mXAxisRelativeLayout.addView(mXAxis)
-        mPolylineSliderGraph.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-            mXAxis.scrollX = scrollX
-            mXAxis.scrollY = scrollY
+        mXAxis.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+            mPolylineSliderGraph.scrollX = scrollX
+            mPolylineSliderGraph.scrollY = scrollY
         }
-
-
     }
 
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
@@ -89,20 +87,23 @@ class PolylineSlider : RelativeLayout {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
         if (!isBaseUIInitialized) {
+
             mPolylineSliderGraph.viewHeight = abs(t - b)
             viewWidth = abs(r - l)
             mPolylineSliderGraph.viewWidth = viewWidth
             mPolylineSliderGraph.mSliderSpacingWidth = getSliderSpacing(mNumberOfDataPoints)
             mPolylineSliderGraph.initializeBaseUI()
+
             mXAxis.mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
             mXAxis.initializeBaseUi()
+
             isBaseUIInitialized = true
             invalidate()
         }
     }
 
     private fun getSliderSpacing(numberOfSliders: Int): Int {
-        val minimumNumberOfSlidersInFocus = 5
+        val minimumNumberOfSlidersInFocus = 8
         return if (numberOfSliders >= minimumNumberOfSlidersInFocus) {
             (viewWidth / minimumNumberOfSlidersInFocus)
         } else {
