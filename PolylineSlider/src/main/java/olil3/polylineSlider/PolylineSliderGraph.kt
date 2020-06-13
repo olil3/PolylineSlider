@@ -5,7 +5,7 @@ import android.graphics.*
 import android.view.View
 import android.view.ViewGroup
 import android.widget.HorizontalScrollView
-import android.widget.RelativeLayout
+import android.widget.LinearLayout
 import android.widget.SeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
@@ -24,7 +24,7 @@ internal class PolylineSliderGraph(
     private val bezierPathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val mGradientPath = Path()
     private val mGradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private lateinit var mScrollViewRelativeLayout: RelativeLayout
+    private lateinit var mScrollViewLinearLayout: LinearLayout
     private var mNumberOfDataPoints = 0
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
@@ -35,15 +35,10 @@ internal class PolylineSliderGraph(
     private lateinit var mSliderWrapperViewIDs: IntArray
 
     init {
-        isHorizontalScrollBarEnabled = false
         mNumberOfDataPoints = mNumberOfDtPts
         sliderAlphaValue = mSliderAlphaVal
         mThumbColor = mThumbClr
         mGradientColor = mGradientCol
-        setOnTouchListener { v, _ ->
-            v.performClick()
-            true
-        }
         objectInit(mContext)
     }
 
@@ -56,26 +51,30 @@ internal class PolylineSliderGraph(
         bezierPathPaint.color = mThumbColor
         bezierPathPaint.style = Paint.Style.STROKE
         bezierPathPaint.strokeWidth = 5f
+        mScrollViewLinearLayout =
+            findViewById(R.id.polylineRelativeLayout)
 
         mSliderThumbColor = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
         mSliderWrapperViewIDs = IntArray(mNumberOfDataPoints)
+        isHorizontalScrollBarEnabled = false
+        setOnTouchListener { v, _ ->
+            v.performClick()
+            true
+        }
     }
 
     fun initializeBaseUI() {
-        mScrollViewRelativeLayout =
-            findViewById(R.id.polylineRelativeLayout)
-
         for (sliderWrapperPos in 0 until mNumberOfDataPoints) {
-            val mSlider = VerticalSeekBar(context)
-            val mSliderWrapper = VerticalSeekBarWrapper(context)
+            val mSliderWrapper = View.inflate(
+                context,
+                R.layout.vertical_seek_bar_item,
+                null
+            ) as VerticalSeekBarWrapper
+            val mSlider = mSliderWrapper.getChildAt(0) as VerticalSeekBar
 
             mSliderWrapper.id = View.generateViewId()
             mSliderWrapperViewIDs[sliderWrapperPos] = mSliderWrapper.id
 
-            mSlider.rotationAngle = VerticalSeekBar.ROTATION_ANGLE_CW_270
-            mSlider.max = 100
-            mSlider.progress = 50
-            mSlider.splitTrack = false
             mSlider.progressDrawable.alpha = sliderAlphaValue
             mSlider.thumb.colorFilter = mSliderThumbColor
             mSlider.progressDrawable.colorFilter = mSliderThumbColor
@@ -103,28 +102,21 @@ internal class PolylineSliderGraph(
                 }
             })
 
-            mSliderWrapper.tag = mSlider
-            mSliderWrapper.addView(mSlider)
 
             val sliderPositioningParams =
-                RelativeLayout.LayoutParams(
+                LinearLayout.LayoutParams(
                     mSliderSpacingWidth,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-            if (sliderWrapperPos != 0) {
-                sliderPositioningParams.addRule(
-                    RelativeLayout.RIGHT_OF,
-                    mSliderWrapperViewIDs[sliderWrapperPos - 1]
-                )
-                mScrollViewRelativeLayout.addView(mSliderWrapper, sliderPositioningParams)
 
-            } else {
-                mScrollViewRelativeLayout.addView(mSliderWrapper, sliderPositioningParams)
+            if (sliderWrapperPos == 0) {
                 mSliderWrapper.post {
                     ySliderThumbPos =
                         getThumbXYCoordinatesAsEPointF(mSlider).y // Get Y - element
                 }
+
             }
+            mScrollViewLinearLayout.addView(mSliderWrapper, sliderPositioningParams)
         }
         invalidate()
     }

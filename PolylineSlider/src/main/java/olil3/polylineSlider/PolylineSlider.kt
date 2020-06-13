@@ -5,14 +5,15 @@ import android.graphics.Color
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import android.widget.RelativeLayout
+import android.widget.LinearLayout
+import androidx.constraintlayout.widget.ConstraintLayout
 import kotlin.math.abs
 
-class PolylineSlider : RelativeLayout {
+class PolylineSlider : ConstraintLayout {
     private var mPolylineSliderGraph: PolylineSliderGraph
     private var mXAxis: xAxis
-    private var mSliderRelativeLayout: RelativeLayout
-    private var mXAxisRelativeLayout: RelativeLayout
+    private var mSliderLinearLayout: LinearLayout
+    private var mXAxisLinearLayout: LinearLayout
     private var mNumberOfDataPoints = 0
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
@@ -26,8 +27,8 @@ class PolylineSlider : RelativeLayout {
         defStyleAttr
     ) {
         View.inflate(context, R.layout.polyline_slider, this)
-        mSliderRelativeLayout = findViewById(R.id.slider_graph)
-        mXAxisRelativeLayout = findViewById(R.id.slider_x_axis)
+        mSliderLinearLayout = findViewById(R.id.slider_graph)
+        mXAxisLinearLayout = findViewById(R.id.slider_x_axis)
 
         /* As this layout acts as a housing for multiple subviews, disable drawing to avoid misuse of resources. */
         setWillNotDraw(true)
@@ -71,12 +72,21 @@ class PolylineSlider : RelativeLayout {
             mGradientColor
         )
         mPolylineSliderGraph.id = View.generateViewId()
-        mSliderRelativeLayout.addView(mPolylineSliderGraph)
+        val mSliderLinearLayoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT
+        )
+        mSliderLinearLayout.addView(mPolylineSliderGraph, mSliderLinearLayoutParams)
         mXAxis = xAxis(mContext, mNumberOfDataPoints, "Hrs")
-        mXAxisRelativeLayout.addView(mXAxis)
-        mXAxis.setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+
+        val xAxisLayoutParams = LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        )
+        mXAxisLinearLayout.addView(mXAxis, xAxisLayoutParams)
+
+        mXAxis.setOnScrollChangeListener { _, scrollX, _, _, _ ->
             mPolylineSliderGraph.scrollX = scrollX
-            mPolylineSliderGraph.scrollY = scrollY
         }
     }
 
@@ -87,16 +97,16 @@ class PolylineSlider : RelativeLayout {
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
         if (!isBaseUIInitialized) {
-
             mPolylineSliderGraph.viewHeight = abs(t - b)
             viewWidth = abs(r - l)
+
             mPolylineSliderGraph.viewWidth = viewWidth
+
             mPolylineSliderGraph.mSliderSpacingWidth = getSliderSpacing(mNumberOfDataPoints)
             mPolylineSliderGraph.initializeBaseUI()
 
-            mXAxis.mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+            mXAxis.mSliderSpacing = mPolylineSliderGraph.mSliderSpacingWidth
             mXAxis.initializeBaseUi()
-
             isBaseUIInitialized = true
             invalidate()
         }
