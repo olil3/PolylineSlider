@@ -20,6 +20,7 @@ internal class PolyBezierPathUtil {
      * @return a Path representing the twice-differentiable curve
      * passing through all the given knots
      */
+
     fun computePathThroughKnots(knots: List<EPointF>): Path {
         throwExceptionIfInputIsInvalid(knots)
         val polyBezierPath = Path()
@@ -47,6 +48,24 @@ internal class PolyBezierPathUtil {
             }
         }
         return polyBezierPath
+    }
+
+    fun computePathThroughKnots(
+        xArray: FloatArray,
+        yArray: FloatArray,
+        mYInitialVal: Float,
+        recyclerViewScrollRange: Int,
+        mGradientPath: Path
+    ): Path {
+        val listToReturn = mutableListOf<EPointF>()
+        for (i in xArray.indices) {
+            listToReturn.add(EPointF(xArray[i], yArray[i]))
+        }
+        listToReturn.add(0, EPointF(0.0f, mYInitialVal))
+        listToReturn.add(EPointF(recyclerViewScrollRange.toFloat(), mYInitialVal))
+        val toReturn = computePathThroughKnots(listToReturn)
+        mGradientPath.set(toReturn)
+        return toReturn
     }
 
     private fun computeControlPoints(

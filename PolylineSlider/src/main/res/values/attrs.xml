@@ -3,8 +3,8 @@
     <declare-styleable name="PolylineSlider">
         <attr name="number_of_data_points" format="integer" />
         <attr name="is_slider_track_visible" format="enum">
-            <enum name="NO" value="0" />
-            <enum name="YES" value="1" />
+            <enum name="No" value="0" />
+            <enum name="Yes" value="255" />
         </attr>
         <attr name="thumb_color" format="color" />
         <attr name="gradient_color" format="color" />
