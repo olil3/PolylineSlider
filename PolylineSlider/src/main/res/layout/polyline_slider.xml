@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/slider_graph"
+        <FrameLayout
+            android:id="@+id/polyline_slider_graph_frame_layout"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_above="@id/slider_x_axis"
-            app:layout_constraintBottom_toTopOf="@+id/slider_x_axis"
+            android:layout_above="@id/polyline_x_axis_frame_layout"
+            android:overScrollMode="never"
+            app:layout_constraintBottom_toTopOf="@+id/polyline_x_axis_frame_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-        <LinearLayout
-            android:id="@+id/slider_x_axis"
+        <FrameLayout
+            android:id="@+id/polyline_x_axis_frame_layout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:layout_height="30dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

@@ -1,43 +1,43 @@
 package olil3.polylineSlider
 
 import android.content.Context
-import android.graphics.*
+import android.content.res.Configuration
+import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
+import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import android.widget.LinearLayout
+import android.view.ViewGroup
+import android.widget.FrameLayout
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
+import kotlin.math.abs
 
 class PolylineSlider : ConstraintLayout {
-    private var mSliderRecyclerView: RecyclerView
-    private var mXAxisLinearLayout: LinearLayout
+    private var mSliderFrameLayout: FrameLayout
+    private var mXAxisFrameLayout: FrameLayout
     private var mNumberOfDataPoints = 0
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
     private var mGradientColor: Int = 0
     private var mSliderSpacing: Int = 0
-    private lateinit var mInitialEPointF: EPointF
-    private lateinit var mEPointFXVal: FloatArray
-    private lateinit var mEPointFYVal: FloatArray
-    private val mBezierUtil = PolyBezierPathUtil()
-    private val mPathPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private val mGradientPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private lateinit var mRecyclerViewParams: IntArray
-    private val mGradientPath = Path()
+    private var isUIInitialized = false
+    private var mViewWidth = 0
+    private var mViewHeight = 0
+    private var mTextViewID: IntArray
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
         attributeSet,
         defStyleAttr
     ) {
-        setWillNotDraw(false)
+        setWillNotDraw(true)
+        isHorizontalScrollBarEnabled = true
         View.inflate(context, R.layout.polyline_slider, this)
-        mSliderRecyclerView = findViewById(R.id.slider_graph)
-        mXAxisLinearLayout = findViewById(R.id.slider_x_axis)
+        mSliderFrameLayout = findViewById(R.id.polyline_slider_graph_frame_layout)
+        mXAxisFrameLayout = findViewById(R.id.polyline_x_axis_frame_layout)
 
         /* As this layout acts as a housing for multiple subviews, disable drawing to avoid misuse of resources. */
         if (attributeSet != null) {
@@ -70,110 +70,106 @@ class PolylineSlider : ConstraintLayout {
                 throw IllegalArgumentException(mContext.resources.getString(R.string.invalid_number_of_data_points))
             }
         }
-        mPathPaint.style = Paint.Style.STROKE
-        mPathPaint.strokeWidth = 5f
-        mPathPaint.color = mThumbColor
-        objectInit()
+        mTextViewID = IntArray(mNumberOfDataPoints)
     }
 
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
+    constructor(mContext: Context) : this(mContext, null, 0)
+
+    override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
+        super.onLayout(changed, left, top, right, bottom)
+        if (!isUIInitialized) {
+            mViewWidth = abs(right - left)
+            mViewHeight = abs(top - bottom)
+            mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+            objectInit()
+            isUIInitialized = true
+        }
+    }
 
     private fun objectInit() {
-        val recyclerViewLayoutManager =
-            LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         val mThumbColorFilter = PorterDuffColorFilter(mThumbColor, PorterDuff.Mode.SRC_ATOP)
         val mSliderColorFilter = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
-        val mSliderWrapperID = IntArray(mNumberOfDataPoints)
 
-        mEPointFXVal = FloatArray(mNumberOfDataPoints)
-        mEPointFYVal = FloatArray(mNumberOfDataPoints)
-        mSliderSpacing = 200
-
-        val mVerticalSliderAdapter = PolylineSliderGraphAdapter(
-            this,
-            mNumberOfDataPoints, mSliderSpacing,
-            sliderAlphaValue, mThumbColorFilter,
-            mSliderColorFilter, mSliderWrapperID, context
+        val mPolylineSliderGraph = PolylineSliderGraph(
+            context, mNumberOfDataPoints,
+            mGradientColor, mSliderSpacing,
+            this, sliderAlphaValue,
+            mThumbColorFilter, mSliderColorFilter,
+            IntArray(mNumberOfDataPoints)
+        )
+        mSliderFrameLayout.addView(
+            mPolylineSliderGraph,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
         )
 
-        mSliderRecyclerView.layoutManager = recyclerViewLayoutManager
-        mSliderRecyclerView.adapter = mVerticalSliderAdapter
+        val mXAxis = XAxis(
+            context,
+            mNumberOfDataPoints,
+            mSliderSpacing,
+            "Hrs",
+            mTextViewID
+        )
 
-        mSliderRecyclerView.post {
-            mRecyclerViewParams = intArrayOf(mSliderRecyclerView.width, mSliderRecyclerView.height)
-            mGradientPaint.shader = LinearGradient(
-                0f,
-                0f,
-                0f,
-                mRecyclerViewParams[1].toFloat(),
-                mGradientColor,
-                Color.TRANSPARENT,
-                Shader.TileMode.MIRROR
+        mXAxisFrameLayout.addView(
+            mXAxis,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
             )
-            mInitialEPointF = getThumbXYCoordinatesAsEPointF(
-                (mSliderRecyclerView.getChildAt(0) as VerticalSeekBarWrapper).getChildAt(0) as VerticalSeekBar
-            )
+        )
 
-            for (addBasePoints in 0 until mNumberOfDataPoints) {
-                mEPointFXVal[addBasePoints] = mInitialEPointF.x + (addBasePoints * mSliderSpacing)
-                mEPointFYVal[addBasePoints] = mInitialEPointF.y
+        mXAxis.setLayout()
+        mXAxis.setAdapter()
+
+        mXAxis.post {
+            mPolylineSliderGraph.setAdapter()
+            mPolylineSliderGraph.setLayoutParams()
+            mPolylineSliderGraph.post {
+                mPolylineSliderGraph.initiatePostSequence()
             }
+        }
+    }
 
-            mSliderRecyclerView.setOnScrollChangeListener { _, _, _, _, _ ->
-                for (updateBasePoints in 0 until mNumberOfDataPoints) {
-                    mEPointFXVal[updateBasePoints] =
-                        mInitialEPointF.x +
-                                (updateBasePoints * mSliderSpacing) -
-                                mSliderRecyclerView.computeHorizontalScrollOffset()
+    internal fun updateText(position: Int, code: Int) {
+        when (code) {
+            0 -> {
+                try {
+                    findViewById<TextView>(mTextViewID[position]).typeface = Typeface.DEFAULT
+                } catch (e: Exception) {
+                    Log.e("Exception Class", "${e.message}")
                 }
-                invalidate()
             }
-            invalidate()
+            1 -> {
+                try {
+                    findViewById<TextView>(mTextViewID[position]).typeface = Typeface.DEFAULT_BOLD
+                } catch (e: Exception) {
+                    Log.e("Exception Class", "${e.message}")
+                }
+            }
+            else -> {
+                Log.e("Wut dis", "$code")
+            }
         }
     }
 
-    private fun getThumbXYCoordinatesAsEPointF(seekBarToFind: VerticalSeekBar): EPointF {
-        val seekBarWrapper = seekBarToFind.parent as VerticalSeekBarWrapper
-        val seekBarThumbBounds = seekBarToFind.thumb.bounds
-        val xPos: Float =
-            seekBarWrapper.left + seekBarThumbBounds.exactCenterY() + ((seekBarWrapper.width - (seekBarToFind.paddingLeft * 1.1f)) / 2)
-        val yPos: Float =
-            seekBarWrapper.bottom - seekBarThumbBounds.exactCenterX() - (seekBarThumbBounds.height() * 0.4f)
-
-        return EPointF(xPos, yPos)
-    }
-
-    override fun onDraw(canvas: Canvas?) {
-        super.onDraw(canvas)
-        try {
-            val pathToDraw = mBezierUtil.computePathThroughKnots(
-                mEPointFXVal,
-                mEPointFYVal,
-                mInitialEPointF.y,
-                this.computeHorizontalScrollRange(),
-                mGradientPath
-            )
-            canvas?.clipRect(
-                this.computeHorizontalScrollOffset(),
-                0,
-                mRecyclerViewParams[0] + this.computeHorizontalScrollOffset(),
-                mRecyclerViewParams[1]
-            )
-            mGradientPath.lineTo(
-                this.computeHorizontalScrollRange().toFloat(),
-                mRecyclerViewParams[1].toFloat()
-            )
-            mGradientPath.lineTo(0.0f, mRecyclerViewParams[1].toFloat())
-            mGradientPath.lineTo(0.0f, mInitialEPointF.y)
-            canvas?.drawPath(mGradientPath, mGradientPaint)
-            canvas?.drawPath(pathToDraw, mPathPaint)
-        } catch (e: UninitializedPropertyAccessException) {
+    private fun getSliderSpacing(numberOfPoints: Int): Int {
+        return if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            val numberOfSlidersInView = 5
+            if (numberOfPoints >= numberOfSlidersInView) {
+                mViewWidth / numberOfSlidersInView
+            } else {
+                mViewWidth / numberOfPoints
+            }
+        } else {
+            mViewWidth / numberOfPoints
         }
     }
 
-    internal fun updateSliderParams(sliderID: Int, position: Int) {
-        val yVal = getThumbXYCoordinatesAsEPointF(findViewById(sliderID)).y
-        mEPointFYVal[position] = yVal
-        invalidate()
+    internal fun performViewScroll(scrollingValue: Int) {
+        (mXAxisFrameLayout.getChildAt(0) as XAxis).scrollBy(scrollingValue, 0)
     }
 }

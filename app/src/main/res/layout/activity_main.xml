@@ -9,12 +9,12 @@
     <olil3.polylineSlider.PolylineSlider
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="300dp"
+        android:layout_marginBottom="500dp"
+        app:is_slider_track_visible="Yes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:is_slider_track_visible="Yes"
-        app:number_of_data_points="24" />
+        app:number_of_data_points="12" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

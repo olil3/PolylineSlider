@@ -32,5 +32,4 @@ internal class EPointF(val x: Float, val y: Float) {
     fun scaleBy(factor: Float): EPointF {
         return EPointF(factor * x, factor * y)
     }
-
 }

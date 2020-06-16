@@ -21,7 +21,7 @@ internal class PolyBezierPathUtil {
      * passing through all the given knots
      */
 
-    fun computePathThroughKnots(knots: List<EPointF>): Path {
+    private fun computePathThroughKnots(knots: List<EPointF>): Path {
         throwExceptionIfInputIsInvalid(knots)
         val polyBezierPath = Path()
         val firstKnot = knots[0]

@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
 import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
 
-class PolylineSliderGraphAdapter(
-    private val mConstraintLayout: PolylineSlider,
+internal class PolylineSliderGraphAdapter(
+    private val mParentRecyclerView: PolylineSliderGraph,
     private val mNumberOfDataPoints: Int,
     private val mSliderSpacing: Int,
     private val mSliderAlphaVal: Int,
@@ -35,12 +35,16 @@ class PolylineSliderGraphAdapter(
                     progress: Int,
                     fromUser: Boolean
                 ) {
-                    mConstraintLayout.updateSliderParams(mSlider.id, position)
+                    mParentRecyclerView.updateSliderParams(mSlider.id, position)
                 }
 
-                override fun onStartTrackingTouch(seekBar: SeekBar?) {}
-                override fun onStopTrackingTouch(seekBar: SeekBar?) {}
+                override fun onStartTrackingTouch(seekBar: SeekBar?) {
+                    mParentRecyclerView.updateText(position, 1)
+                }
 
+                override fun onStopTrackingTouch(seekBar: SeekBar?) {
+                    mParentRecyclerView.updateText(position, 0)
+                }
             })
     }
 
@@ -68,6 +72,6 @@ class PolylineSliderGraphAdapter(
         return position
     }
 
-    inner class VerticalSeekBarObject(val mSliderWrapper: VerticalSeekBarWrapper) :
+    class VerticalSeekBarObject(val mSliderWrapper: VerticalSeekBarWrapper) :
         RecyclerView.ViewHolder(mSliderWrapper)
 }
