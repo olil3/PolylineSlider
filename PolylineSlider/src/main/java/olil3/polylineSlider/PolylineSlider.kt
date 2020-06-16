@@ -27,14 +27,13 @@ class PolylineSlider : ConstraintLayout {
     private var mViewWidth = 0
     private var mViewHeight = 0
     private var mTextViewID: IntArray
-
+    private var mSliderID: IntArray
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
         attributeSet,
         defStyleAttr
     ) {
         setWillNotDraw(true)
-        isHorizontalScrollBarEnabled = true
         View.inflate(context, R.layout.polyline_slider, this)
         mSliderFrameLayout = findViewById(R.id.polyline_slider_graph_frame_layout)
         mXAxisFrameLayout = findViewById(R.id.polyline_x_axis_frame_layout)
@@ -71,6 +70,7 @@ class PolylineSlider : ConstraintLayout {
             }
         }
         mTextViewID = IntArray(mNumberOfDataPoints)
+        mSliderID = IntArray(mNumberOfDataPoints)
     }
 
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
@@ -96,7 +96,7 @@ class PolylineSlider : ConstraintLayout {
             mGradientColor, mSliderSpacing,
             this, sliderAlphaValue,
             mThumbColorFilter, mSliderColorFilter,
-            IntArray(mNumberOfDataPoints)
+            mSliderID
         )
         mSliderFrameLayout.addView(
             mPolylineSliderGraph,
