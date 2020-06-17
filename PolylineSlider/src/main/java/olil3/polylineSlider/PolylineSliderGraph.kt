@@ -157,4 +157,12 @@ internal class PolylineSliderGraph(
     internal fun updateText(position: Int, code: Int) {
         mPolylineSlider.updateText(position, code)
     }
+
+    internal fun displayYAxisProgress(position: Int, progress: Int) {
+        mPolylineSlider.displayYAxisProgress(position, progress)
+    }
+
+    internal fun changeSliderAlpha(progress: Int, code: Int) {
+        mPolylineSlider.changeSliderAlpha(progress, code)
+    }
 }

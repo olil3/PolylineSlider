@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
 import kotlin.math.abs
 
 class PolylineSlider : ConstraintLayout {
@@ -28,6 +29,7 @@ class PolylineSlider : ConstraintLayout {
     private var mViewHeight = 0
     private var mTextViewID: IntArray
     private var mSliderID: IntArray
+    private var yAxisSlider: VerticalSeekBar
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
         attributeSet,
@@ -69,6 +71,12 @@ class PolylineSlider : ConstraintLayout {
                 throw IllegalArgumentException(mContext.resources.getString(R.string.invalid_number_of_data_points))
             }
         }
+        yAxisSlider = findViewById(R.id.mySeekBar)
+        yAxisSlider.setOnTouchListener { _, _ ->
+            true
+        }
+        yAxisSlider.progressDrawable.alpha = 0
+        yAxisSlider.thumb.alpha = 0
         mTextViewID = IntArray(mNumberOfDataPoints)
         mSliderID = IntArray(mNumberOfDataPoints)
     }
@@ -171,5 +179,22 @@ class PolylineSlider : ConstraintLayout {
 
     internal fun performViewScroll(scrollingValue: Int) {
         (mXAxisFrameLayout.getChildAt(0) as XAxis).scrollBy(scrollingValue, 0)
+    }
+
+    internal fun displayYAxisProgress(position: Int, progress: Int) {
+        yAxisSlider.progress = progress
+    }
+
+    internal fun changeSliderAlpha(progress: Int, code: Int) {
+        when (code) {
+            0 -> {
+                yAxisSlider.progressDrawable.alpha = 0
+            }
+
+            1 -> {
+                yAxisSlider.progress = progress
+                yAxisSlider.progressDrawable.alpha = 255
+            }
+        }
     }
 }

@@ -2,7 +2,9 @@ package olil3.polylineSlider
 
 import android.content.Context
 import android.graphics.PorterDuffColorFilter
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
@@ -36,6 +38,7 @@ internal class PolylineSliderGraphAdapter(
                     fromUser: Boolean
                 ) {
                     mParentRecyclerView.updateSliderParams(mSlider.id, position)
+                    mParentRecyclerView.displayYAxisProgress(position, mSlider.progress)
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -46,6 +49,17 @@ internal class PolylineSliderGraphAdapter(
                     mParentRecyclerView.updateText(position, 0)
                 }
             })
+        mSlider.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_DOWN) {
+                Log.e("Slider Down", "id: $position")
+                mParentRecyclerView.changeSliderAlpha(mSlider.progress, 1)
+            } else if (event.action == MotionEvent.ACTION_UP) {
+                mParentRecyclerView.changeSliderAlpha(mSlider.progress, 0)
+                Log.e("Slider up", "id: $position")
+            }
+            v.performClick()
+            false
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerticalSeekBarObject {
