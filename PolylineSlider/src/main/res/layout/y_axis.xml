@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/mPercentageView"
+        android:layout_width="match_parent"
+        android:layout_alignParentTop="true"
+        android:layout_height="20dp"/>
+
+    <olil3.polylineSlider.uiComponents.VerticalSlider
+        android:id = "@+id/mProgressBar"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/mPercentageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</merge>

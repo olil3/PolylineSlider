@@ -1,4 +1,4 @@
-package olil3.polylineSlider
+package olil3.polylineSlider.uiComponents
 
 import android.content.Context
 import android.view.MotionEvent
@@ -25,7 +25,13 @@ internal class XAxis(
     }
 
     fun setAdapter() {
-        adapter = XAxisAdapter(context, mNumberOfTextBoxes, mTextBoxSpacing, xAxisUnit, mTextBoxID)
+        adapter = XAxisAdapter(
+            context,
+            mNumberOfTextBoxes,
+            mTextBoxSpacing,
+            xAxisUnit,
+            mTextBoxID
+        )
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

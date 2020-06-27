@@ -1,4 +1,4 @@
-package olil3.polylineSlider
+package olil3.polylineSlider.uiComponents
 
 import android.content.Context
 import android.view.Gravity
@@ -21,12 +21,14 @@ internal class XAxisAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TextBoxViewHolder {
         val mTextBox = TextView(mContext)
         mTextBox.id = View.generateViewId()
-        mTextBox.textSize = 18f
+        mTextBox.textSize = 12f
         mTextBox.gravity = Gravity.CENTER
         mTextBox.layoutParams =
             ViewGroup.LayoutParams(mTextBoxSpacing, ViewGroup.LayoutParams.MATCH_PARENT)
 
-        return TextBoxViewHolder(mTextBox)
+        return TextBoxViewHolder(
+            mTextBox
+        )
     }
 
     override fun getItemCount(): Int {

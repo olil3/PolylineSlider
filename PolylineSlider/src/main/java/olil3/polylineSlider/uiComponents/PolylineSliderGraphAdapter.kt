@@ -1,16 +1,13 @@
-package olil3.polylineSlider
+package olil3.polylineSlider.uiComponents
 
 import android.content.Context
 import android.graphics.PorterDuffColorFilter
 import android.util.Log
-import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.recyclerview.widget.RecyclerView
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
 
 internal class PolylineSliderGraphAdapter(
     private val mParentRecyclerView: PolylineSliderGraph,
@@ -28,17 +25,17 @@ internal class PolylineSliderGraphAdapter(
     }
 
     override fun onBindViewHolder(holder: VerticalSeekBarObject, position: Int) {
-        mSliderWrapperIDArray[position] = holder.mSliderWrapper.id
-        val mSlider = holder.mSliderWrapper.getChildAt(0) as VerticalSeekBar
-        mSlider
+        mSliderWrapperIDArray[position] = holder.mVerticalSlider.id
+        val mVerticalSliderSeekBar = holder.mVerticalSlider.getSeekBarObject()
+        mVerticalSliderSeekBar
             .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
                     seekBar: SeekBar?,
                     progress: Int,
                     fromUser: Boolean
                 ) {
-                    mParentRecyclerView.updateSliderParams(mSlider.id, position)
-                    mParentRecyclerView.displayYAxisProgress(position, mSlider.progress)
+                    mParentRecyclerView.updateSliderParams(holder.mVerticalSlider, position)
+                    mParentRecyclerView.displayYAxisProgress(position, mVerticalSliderSeekBar.progress)
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -49,12 +46,12 @@ internal class PolylineSliderGraphAdapter(
                     mParentRecyclerView.updateText(position, 0)
                 }
             })
-        mSlider.setOnTouchListener { v, event ->
+        mVerticalSliderSeekBar.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 Log.e("Slider Down", "id: $position")
-                mParentRecyclerView.changeSliderAlpha(mSlider.progress, 1)
+                mParentRecyclerView.changeSliderAlpha(mVerticalSliderSeekBar.progress, 1)
             } else if (event.action == MotionEvent.ACTION_UP) {
-                mParentRecyclerView.changeSliderAlpha(mSlider.progress, 0)
+                mParentRecyclerView.changeSliderAlpha(mVerticalSliderSeekBar.progress, 0)
                 Log.e("Slider up", "id: $position")
             }
             v.performClick()
@@ -63,19 +60,16 @@ internal class PolylineSliderGraphAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerticalSeekBarObject {
-        val mSliderWrapper = LayoutInflater.from(mContext)
-            .inflate(R.layout.vertical_seek_bar_item, parent, false) as VerticalSeekBarWrapper
-        mSliderWrapper.layoutParams =
+        val mVerticalSlider = VerticalSlider(mContext)
+        mVerticalSlider.layoutParams =
             RecyclerView.LayoutParams(mSliderSpacing, RecyclerView.LayoutParams.MATCH_PARENT)
-        mSliderWrapper.id = View.generateViewId()
-
-        val mSlider = mSliderWrapper.getChildAt(0) as VerticalSeekBar
-        mSlider.id = View.generateViewId()
-
-        mSlider.progressDrawable.alpha = mSliderAlphaVal
-        mSlider.thumb.colorFilter = mThumbColorFilter
-        mSlider.progressDrawable.colorFilter = mSliderColorFilter
-        return (VerticalSeekBarObject(mSliderWrapper))
+        mVerticalSlider.id = View.generateViewId()
+        mVerticalSlider.sliderAlpha = mSliderAlphaVal
+        mVerticalSlider.thumbColor = mThumbColorFilter
+        mVerticalSlider.sliderColor = mSliderColorFilter
+        return (VerticalSeekBarObject(
+            mVerticalSlider
+        ))
     }
 
     override fun getItemId(position: Int): Long {
@@ -86,6 +80,6 @@ internal class PolylineSliderGraphAdapter(
         return position
     }
 
-    class VerticalSeekBarObject(val mSliderWrapper: VerticalSeekBarWrapper) :
-        RecyclerView.ViewHolder(mSliderWrapper)
+    class VerticalSeekBarObject(val mVerticalSlider: VerticalSlider) :
+        RecyclerView.ViewHolder(mVerticalSlider)
 }

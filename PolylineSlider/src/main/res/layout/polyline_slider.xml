@@ -4,23 +4,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-        <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-            android:id="@+id/verticalSeekBarWrapper"
-            android:layout_width="20dp"
+        <olil3.polylineSlider.uiComponents.YAxis
+            android:id="@+id/mYAxis"
+            android:layout_width="35dp"
             android:layout_height="0dp"
             app:layout_constraintBottom_toTopOf="@+id/space"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
-
-                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-                    android:id="@+id/mySeekBar"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:max="100"
-                    android:progress="50"
-                    android:splitTrack="false"
-                    app:seekBarRotation="CW270" /> <!-- Rotation: CW90 or CW270 -->
-        </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+        </olil3.polylineSlider.uiComponents.YAxis>
 
         <FrameLayout
             android:id="@+id/polyline_slider_graph_frame_layout"
@@ -30,21 +21,21 @@
             android:overScrollMode="never"
             app:layout_constraintBottom_toTopOf="@+id/polyline_x_axis_frame_layout"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/verticalSeekBarWrapper"
+            app:layout_constraintStart_toEndOf="@+id/mYAxis"
             app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/polyline_x_axis_frame_layout"
             android:layout_width="0dp"
-            android:layout_height="30dp"
+            android:layout_height="25dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/space" />
+            app:layout_constraintStart_toEndOf="@+id/space"/>
 
         <Space
             android:id="@+id/space"
-            android:layout_width="20dp"
-            android:layout_height="30dp"
+            android:layout_width="35dp"
+            android:layout_height="25dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
 

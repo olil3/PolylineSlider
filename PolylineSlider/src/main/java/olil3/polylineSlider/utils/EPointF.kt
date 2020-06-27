@@ -1,4 +1,4 @@
-package olil3.polylineSlider
+package olil3.polylineSlider.utils
 
 /**
  * This segment of the code is authored by:
@@ -11,10 +11,13 @@ package olil3.polylineSlider
  * This code has been slightly modified and adapted for the use of this project.
  * API inspired by the Apache Commons Math Vector2D class.
  */
-internal class EPointF(val x: Float, val y: Float) {
+class EPointF(val x: Float, val y: Float) {
 
     fun plus(factor: Float, ePointF: EPointF): EPointF {
-        return EPointF(x + factor * ePointF.x, y + factor * ePointF.y)
+        return EPointF(
+            x + factor * ePointF.x,
+            y + factor * ePointF.y
+        )
     }
 
     operator fun plus(ePointF: EPointF): EPointF {
@@ -22,7 +25,10 @@ internal class EPointF(val x: Float, val y: Float) {
     }
 
     fun minus(factor: Float, ePointF: EPointF): EPointF {
-        return EPointF(x - factor * ePointF.x, y - factor * ePointF.y)
+        return EPointF(
+            x - factor * ePointF.x,
+            y - factor * ePointF.y
+        )
     }
 
     operator fun minus(ePointF: EPointF): EPointF {

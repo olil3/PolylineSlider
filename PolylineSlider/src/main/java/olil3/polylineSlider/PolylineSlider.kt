@@ -13,10 +13,12 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
 import kotlin.math.abs
+import olil3.polylineSlider.uiComponents.PolylineSliderGraph
+import olil3.polylineSlider.uiComponents.XAxis
+import olil3.polylineSlider.uiComponents.YAxis
 
-class PolylineSlider : ConstraintLayout {
+class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     private var mSliderFrameLayout: FrameLayout
     private var mXAxisFrameLayout: FrameLayout
     private var mNumberOfDataPoints = 0
@@ -29,13 +31,13 @@ class PolylineSlider : ConstraintLayout {
     private var mViewHeight = 0
     private var mTextViewID: IntArray
     private var mSliderID: IntArray
-    private var yAxisSlider: VerticalSeekBar
+    private var yAxisSlider: YAxis
+
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
         attributeSet,
         defStyleAttr
     ) {
-        setWillNotDraw(true)
         View.inflate(context, R.layout.polyline_slider, this)
         mSliderFrameLayout = findViewById(R.id.polyline_slider_graph_frame_layout)
         mXAxisFrameLayout = findViewById(R.id.polyline_x_axis_frame_layout)
@@ -71,12 +73,7 @@ class PolylineSlider : ConstraintLayout {
                 throw IllegalArgumentException(mContext.resources.getString(R.string.invalid_number_of_data_points))
             }
         }
-        yAxisSlider = findViewById(R.id.mySeekBar)
-        yAxisSlider.setOnTouchListener { _, _ ->
-            true
-        }
-        yAxisSlider.progressDrawable.alpha = 0
-        yAxisSlider.thumb.alpha = 0
+        yAxisSlider = findViewById(R.id.mYAxis)
         mTextViewID = IntArray(mNumberOfDataPoints)
         mSliderID = IntArray(mNumberOfDataPoints)
     }
@@ -86,7 +83,7 @@ class PolylineSlider : ConstraintLayout {
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        if (!isUIInitialized) {
+        if (!isUIInitialized || changed) {
             mViewWidth = abs(right - left)
             mViewHeight = abs(top - bottom)
             mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
@@ -99,13 +96,14 @@ class PolylineSlider : ConstraintLayout {
         val mThumbColorFilter = PorterDuffColorFilter(mThumbColor, PorterDuff.Mode.SRC_ATOP)
         val mSliderColorFilter = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
 
-        val mPolylineSliderGraph = PolylineSliderGraph(
-            context, mNumberOfDataPoints,
-            mGradientColor, mSliderSpacing,
-            this, sliderAlphaValue,
-            mThumbColorFilter, mSliderColorFilter,
-            mSliderID
-        )
+        val mPolylineSliderGraph =
+            PolylineSliderGraph(
+                context, mNumberOfDataPoints,
+                mGradientColor, mSliderSpacing,
+                this, sliderAlphaValue,
+                mThumbColorFilter, mSliderColorFilter,
+                mSliderID
+            )
         mSliderFrameLayout.addView(
             mPolylineSliderGraph,
             ViewGroup.LayoutParams(
@@ -179,21 +177,22 @@ class PolylineSlider : ConstraintLayout {
 
     internal fun performViewScroll(scrollingValue: Int) {
         (mXAxisFrameLayout.getChildAt(0) as XAxis).scrollBy(scrollingValue, 0)
+        yAxisSlider.visibility = false
     }
 
     internal fun displayYAxisProgress(position: Int, progress: Int) {
-        yAxisSlider.progress = progress
+        yAxisSlider.setSliderProgress(progress)
     }
 
     internal fun changeSliderAlpha(progress: Int, code: Int) {
         when (code) {
             0 -> {
-                yAxisSlider.progressDrawable.alpha = 0
+                yAxisSlider.visibility = false
             }
 
             1 -> {
-                yAxisSlider.progress = progress
-                yAxisSlider.progressDrawable.alpha = 255
+                yAxisSlider.setSliderProgress(progress)
+                yAxisSlider.visibility = true
             }
         }
     }

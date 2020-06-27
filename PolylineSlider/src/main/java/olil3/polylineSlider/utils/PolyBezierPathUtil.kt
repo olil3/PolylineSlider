@@ -1,8 +1,8 @@
-package olil3.polylineSlider
+package olil3.polylineSlider.utils
 
 import android.graphics.Path
 
-internal class PolyBezierPathUtil {
+class PolyBezierPathUtil {
     /**
      * This segment of this library is authored by:
      * Stuart Kent
@@ -59,10 +59,23 @@ internal class PolyBezierPathUtil {
     ): Path {
         val listToReturn = mutableListOf<EPointF>()
         for (i in xArray.indices) {
-            listToReturn.add(EPointF(xArray[i], yArray[i]))
+            listToReturn.add(
+                EPointF(
+                    xArray[i],
+                    yArray[i]
+                )
+            )
         }
-        listToReturn.add(0, EPointF(0.0f, mYInitialVal))
-        listToReturn.add(EPointF(recyclerViewScrollRange.toFloat(), mYInitialVal))
+        listToReturn.add(
+            0,
+            EPointF(0.0f, mYInitialVal)
+        )
+        listToReturn.add(
+            EPointF(
+                recyclerViewScrollRange.toFloat(),
+                mYInitialVal
+            )
+        )
         val toReturn = computePathThroughKnots(listToReturn)
         mGradientPath.set(toReturn)
         return toReturn

@@ -1,4 +1,4 @@
-package olil3.polylineSlider
+package olil3.polylineSlider.uiComponents
 
 import android.content.Context
 import android.graphics.Canvas
@@ -11,8 +11,9 @@ import android.graphics.Shader
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-import com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
+import olil3.polylineSlider.PolylineSlider
+import olil3.polylineSlider.utils.EPointF
+import olil3.polylineSlider.utils.PolyBezierPathUtil
 
 internal class PolylineSliderGraph(
     mContext: Context,
@@ -48,22 +49,23 @@ internal class PolylineSliderGraph(
     }
 
     fun setAdapter() {
-        val mAdapter = PolylineSliderGraphAdapter(
-            this,
-            mNumberOfDataPoints,
-            mSliderSpacing,
-            mSliderAlphaVal,
-            mThumbColorFilter,
-            mSliderColorFilter,
-            mSliderWrapperID,
-            context
-        )
+        val mAdapter =
+            PolylineSliderGraphAdapter(
+                this,
+                mNumberOfDataPoints,
+                mSliderSpacing,
+                mSliderAlphaVal,
+                mThumbColorFilter,
+                mSliderColorFilter,
+                mSliderWrapperID,
+                context
+            )
         this.adapter = mAdapter
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         super.onLayout(changed, l, t, r, b)
-        if (!isLayout) {
+        if (changed) {
             mViewHeight = height
             mViewWidth = width
             mGradientPaint.shader = LinearGradient(
@@ -75,7 +77,7 @@ internal class PolylineSliderGraph(
                 Color.TRANSPARENT,
                 Shader.TileMode.MIRROR
             )
-            isLayout = true
+            isLayout = changed
         }
     }
 
@@ -85,9 +87,8 @@ internal class PolylineSliderGraph(
         mPathPaint.style = Paint.Style.STROKE
         mPathPaint.strokeWidth = 5f
         mPathPaint.color = Color.MAGENTA
-        mInitialEPointF = getThumbXYCoordinatesAsEPointF(
-            (this.getChildAt(0) as VerticalSeekBarWrapper).getChildAt(0) as VerticalSeekBar
-        )
+        mInitialEPointF =
+            (this.getChildAt(0) as VerticalSlider).getSliderCoordinates()
 
         for (addBasePoints in 0 until mNumberOfDataPoints) {
             mEPointFXVal[addBasePoints] = mInitialEPointF.x + (addBasePoints * mSliderSpacing)
@@ -121,12 +122,12 @@ internal class PolylineSliderGraph(
                 canvas?.clipRect(
                     0,
                     0,
-                    mViewWidth,
-                    mViewHeight
+                    measuredWidth,
+                    measuredHeight
                 )
                 mGradientPath.lineTo(
                     this.computeHorizontalScrollRange().toFloat(),
-                    mViewHeight.toFloat()
+                    measuredHeight.toFloat()
                 )
                 mGradientPath.lineTo(0.0f, mViewHeight.toFloat())
                 mGradientPath.lineTo(0.0f, mInitialEPointF.y)
@@ -137,19 +138,8 @@ internal class PolylineSliderGraph(
         }
     }
 
-    private fun getThumbXYCoordinatesAsEPointF(seekBarToFind: VerticalSeekBar): EPointF {
-        val seekBarWrapper = seekBarToFind.parent as VerticalSeekBarWrapper
-        val seekBarThumbBounds = seekBarToFind.thumb.bounds
-        val xPos: Float =
-            seekBarWrapper.left + seekBarThumbBounds.exactCenterY() + ((seekBarWrapper.width - (seekBarToFind.paddingLeft * 1.1f)) / 2)
-        val yPos: Float =
-            seekBarWrapper.bottom - seekBarThumbBounds.exactCenterX() - (seekBarThumbBounds.height() * 0.4f)
-
-        return EPointF(xPos, yPos)
-    }
-
-    internal fun updateSliderParams(sliderID: Int, position: Int) {
-        val yVal = getThumbXYCoordinatesAsEPointF(findViewById(sliderID)).y
+    internal fun updateSliderParams(mVerticalSlider: VerticalSlider, position: Int) {
+        val yVal = mVerticalSlider.getSliderCoordinates().y
         mEPointFYVal[position] = yVal
         invalidate()
     }
