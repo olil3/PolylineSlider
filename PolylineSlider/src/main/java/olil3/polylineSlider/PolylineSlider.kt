@@ -111,11 +111,13 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
             if (!isUIInitialized) {
+                mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
                 objectInit()
                 isUIInitialized = true
+            } else {
+                mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+                updateLayout()
             }
-            mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
-            updateLayout()
         }
     }
 
