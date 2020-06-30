@@ -20,7 +20,7 @@ internal const val ON_TOUCH_DOWN = 100
 internal const val ON_TOUCH_UP = 200
 
 class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
-    private lateinit var mSlider: PolylineSliderGraph
+    private lateinit var mSliderComponent: PolylineSliderGraph
     private lateinit var mXAxis: Axis
     private lateinit var mYAxis: Axis
     private var mNumberOfDataPoints = 1
@@ -125,8 +125,8 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         val mThumbColorFilter = PorterDuffColorFilter(mThumbColor, PorterDuff.Mode.SRC_ATOP)
         val mSliderColorFilter = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
 
-        mSlider = findViewById(R.id.polyline_slider_graph)
-        mSlider
+        mSliderComponent = findViewById(R.id.polyline_slider_graph)
+        mSliderComponent
             .initParams(
                 mNumberOfDataPoints,
                 mGradientColor,
@@ -155,14 +155,14 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         mXAxis.setAdapter(X_AXIS_TYPE, 0)
         mXAxis.setLayout()
 
-        mSlider.setAdapter()
-        mSlider.setLayoutParams()
-        mSlider.post {
-            mSlider.initiatePostSequence()
+        mSliderComponent.setAdapter()
+        mSliderComponent.setLayoutParams()
+        mSliderComponent.post {
+            mSliderComponent.initiatePostSequence()
         }
     }
 
-    internal fun updateText(position: Int, code: Int) {
+    fun updateText(position: Int, code: Int) {
         when (code) {
             ON_TOUCH_UP -> {
                 try {
@@ -198,18 +198,18 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         }
     }
 
-    internal fun performViewScroll(scrollingValue: Int) {
+    fun performViewScroll(scrollingValue: Int) {
         mXAxis.scrollBy(scrollingValue, 0)
         mYAxis.scrollBy(scrollingValue, 0)
     }
 
-    internal fun changeYAxisProgress(position: Int, progress: Int) {
+    fun changeYAxisProgress(position: Int, progress: Int) {
         mYAxis.changeYAxisProgress(position, progress)
     }
 
     private fun updateLayout() {
         mYAxis.updateLayout(mSliderSpacing)
         mXAxis.updateLayout(mSliderSpacing)
-        mSlider.updateLayout(mSliderSpacing)
+        mSliderComponent.updateLayout(mSliderSpacing)
     }
 }

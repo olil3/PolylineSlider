@@ -171,13 +171,13 @@ internal class PolylineSliderGraph : RecyclerView {
         }
     }
 
-    internal fun updateSliderParams(mVerticalSlider: VerticalSlider, position: Int) {
+    fun updateSliderParams(mVerticalSlider: VerticalSlider, position: Int) {
         val yVal = mVerticalSlider.getSliderCoordinates().y
         mEPointFYVal[position] = yVal
         invalidate()
     }
 
-    internal fun updateText(position: Int, code: Int) {
+    fun updateText(position: Int, code: Int) {
         mPolylineSlider.updateText(position, code)
     }
 
