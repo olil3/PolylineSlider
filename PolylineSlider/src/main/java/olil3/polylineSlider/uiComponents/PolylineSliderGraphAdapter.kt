@@ -6,6 +6,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.recyclerview.widget.RecyclerView
+import olil3.polylineSlider.ON_TOUCH_DOWN
+import olil3.polylineSlider.ON_TOUCH_UP
 import olil3.polylineSlider.utils.VerticalSlider
 
 internal class PolylineSliderGraphAdapter(
@@ -38,11 +40,11 @@ internal class PolylineSliderGraphAdapter(
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                    mParentRecyclerView.updateText(position, 1)
+                    mParentRecyclerView.updateText(position, ON_TOUCH_DOWN)
                 }
 
                 override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                    mParentRecyclerView.updateText(position, 0)
+                    mParentRecyclerView.updateText(position, ON_TOUCH_UP)
                 }
             })
     }

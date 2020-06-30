@@ -16,6 +16,8 @@ import olil3.polylineSlider.uiComponents.PolylineSliderGraph
 
 internal const val X_AXIS_TYPE = 1000
 internal const val Y_AXIS_TYPE = 2000
+internal const val ON_TOUCH_DOWN = 100
+internal const val ON_TOUCH_UP = 200
 
 class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     private lateinit var mSlider: PolylineSliderGraph
@@ -159,14 +161,14 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
 
     internal fun updateText(position: Int, code: Int) {
         when (code) {
-            0 -> {
+            ON_TOUCH_UP -> {
                 try {
                     findViewById<TextView>(mXAxisTextViewIDs[position]).typeface = Typeface.DEFAULT
                 } catch (e: Exception) {
                     Log.e("Exception Class", "${e.message}")
                 }
             }
-            1 -> {
+            ON_TOUCH_DOWN -> {
                 try {
                     findViewById<TextView>(mXAxisTextViewIDs[position]).typeface =
                         Typeface.DEFAULT_BOLD
