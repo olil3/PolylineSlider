@@ -9,6 +9,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_above="@id/polyline_x_axis"
+            android:overScrollMode="never"
             app:layout_constraintBottom_toTopOf="@+id/polyline_x_axis"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -18,6 +19,7 @@
             android:id="@+id/polyline_x_axis"
             android:layout_width="0dp"
             android:layout_height="25dp"
+            android:overScrollMode="never"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />
@@ -26,6 +28,7 @@
             android:id="@+id/polyline_y_axis"
             android:layout_width="0dp"
             android:layout_height="25dp"
+            android:overScrollMode="never"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
