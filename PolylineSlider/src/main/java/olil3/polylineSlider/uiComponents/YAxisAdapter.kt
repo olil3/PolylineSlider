@@ -21,7 +21,6 @@ internal class YAxisAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): YAxisValueTextViewHolder {
         val mValueTextView = TextView(mContext)
         mValueTextView.id = View.generateViewId()
-
         mValueTextView.textSize = 12f
         mValueTextView.gravity = Gravity.CENTER
         mValueTextView.layoutParams =

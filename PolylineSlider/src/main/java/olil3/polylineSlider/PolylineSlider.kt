@@ -84,10 +84,13 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
-        if (!isUIInitialized || changed) {
+        if (changed) {
+            if (!isUIInitialized) {
+                objectInit()
+                isUIInitialized = true
+            }
             mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
-            objectInit()
-            isUIInitialized = true
+            updateLayout()
         }
     }
 
@@ -173,5 +176,11 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
 
     internal fun changeYAxisProgress(position: Int, progress: Int) {
         mYAxis.changeYAxisProgress(position, progress)
+    }
+
+    private fun updateLayout() {
+        mYAxis.updateLayout(mSliderSpacing)
+        mXAxis.updateLayout(mSliderSpacing)
+        mSlider.updateLayout(mSliderSpacing)
     }
 }

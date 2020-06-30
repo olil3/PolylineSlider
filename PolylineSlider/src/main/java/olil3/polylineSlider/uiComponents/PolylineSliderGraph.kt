@@ -180,4 +180,11 @@ internal class PolylineSliderGraph : RecyclerView {
     fun displayYAxisProgress(position: Int, progress: Int) {
         mPolylineSlider.changeYAxisProgress(position, progress)
     }
+
+    fun updateLayout(newSliderSpacing: Int) {
+        for (viewIDs in mSliderWrapperID) {
+            findViewById<VerticalSlider>(viewIDs).layoutParams.width = newSliderSpacing
+        }
+        requestLayout()
+    }
 }

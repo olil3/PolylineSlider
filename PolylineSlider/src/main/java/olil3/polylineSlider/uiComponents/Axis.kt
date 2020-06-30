@@ -86,4 +86,11 @@ internal class Axis : RecyclerView {
                 ((progress).toString() + mAxisUnit)
         }
     }
+
+    fun updateLayout(newSliderSpacing: Int) {
+        for (viewIDs in mTextBoxID) {
+            findViewById<TextView>(viewIDs).layoutParams.width = newSliderSpacing
+        }
+        requestLayout()
+    }
 }
