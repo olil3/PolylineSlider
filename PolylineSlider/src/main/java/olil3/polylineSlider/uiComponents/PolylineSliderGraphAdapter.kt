@@ -2,12 +2,11 @@ package olil3.polylineSlider.uiComponents
 
 import android.content.Context
 import android.graphics.PorterDuffColorFilter
-import android.util.Log
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.recyclerview.widget.RecyclerView
+import olil3.polylineSlider.utils.VerticalSlider
 
 internal class PolylineSliderGraphAdapter(
     private val mParentRecyclerView: PolylineSliderGraph,
@@ -46,17 +45,6 @@ internal class PolylineSliderGraphAdapter(
                     mParentRecyclerView.updateText(position, 0)
                 }
             })
-        mVerticalSliderSeekBar.setOnTouchListener { v, event ->
-            if (event.action == MotionEvent.ACTION_DOWN) {
-                Log.e("Slider Down", "id: $position")
-                mParentRecyclerView.changeSliderAlpha(mVerticalSliderSeekBar.progress, 1)
-            } else if (event.action == MotionEvent.ACTION_UP) {
-                mParentRecyclerView.changeSliderAlpha(mVerticalSliderSeekBar.progress, 0)
-                Log.e("Slider up", "id: $position")
-            }
-            v.performClick()
-            false
-        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerticalSeekBarObject {

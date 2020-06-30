@@ -9,29 +9,27 @@ import android.graphics.Typeface
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
-import kotlin.math.abs
+import olil3.polylineSlider.uiComponents.Axis
 import olil3.polylineSlider.uiComponents.PolylineSliderGraph
-import olil3.polylineSlider.uiComponents.XAxis
-import olil3.polylineSlider.uiComponents.YAxis
+
+internal const val X_AXIS_TYPE = 1000
+internal const val Y_AXIS_TYPE = 2000
 
 class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
-    private var mSliderFrameLayout: FrameLayout
-    private var mXAxisFrameLayout: FrameLayout
+    private lateinit var mSlider: PolylineSliderGraph
+    private lateinit var mXAxis: Axis
+    private lateinit var mYAxis: Axis
     private var mNumberOfDataPoints = 0
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
     private var mGradientColor: Int = 0
     private var mSliderSpacing: Int = 0
     private var isUIInitialized = false
-    private var mViewWidth = 0
-    private var mViewHeight = 0
     private var mTextViewID: IntArray
     private var mSliderID: IntArray
-    private var yAxisSlider: YAxis
+    private var mPercentageViewID: IntArray
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -39,8 +37,6 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         defStyleAttr
     ) {
         View.inflate(context, R.layout.polyline_slider, this)
-        mSliderFrameLayout = findViewById(R.id.polyline_slider_graph_frame_layout)
-        mXAxisFrameLayout = findViewById(R.id.polyline_x_axis_frame_layout)
 
         /* As this layout acts as a housing for multiple subviews, disable drawing to avoid misuse of resources. */
         if (attributeSet != null) {
@@ -73,19 +69,22 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 throw IllegalArgumentException(mContext.resources.getString(R.string.invalid_number_of_data_points))
             }
         }
-        yAxisSlider = findViewById(R.id.mYAxis)
         mTextViewID = IntArray(mNumberOfDataPoints)
         mSliderID = IntArray(mNumberOfDataPoints)
+        mPercentageViewID = IntArray(mNumberOfDataPoints)
     }
 
-    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
-    constructor(mContext: Context) : this(mContext, null, 0)
+    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0) {
+        // Do nothing.
+    }
+
+    constructor(mContext: Context) : this(mContext, null, 0) {
+        // Do nothing.
+    }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (!isUIInitialized || changed) {
-            mViewWidth = abs(right - left)
-            mViewHeight = abs(top - bottom)
             mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
             objectInit()
             isUIInitialized = true
@@ -96,47 +95,39 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         val mThumbColorFilter = PorterDuffColorFilter(mThumbColor, PorterDuff.Mode.SRC_ATOP)
         val mSliderColorFilter = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
 
-        val mPolylineSliderGraph =
-            PolylineSliderGraph(
-                context, mNumberOfDataPoints,
-                mGradientColor, mSliderSpacing,
-                this, sliderAlphaValue,
-                mThumbColorFilter, mSliderColorFilter,
+        mSlider = findViewById(R.id.polyline_slider_graph)
+        mSlider
+            .initParams(
+                mNumberOfDataPoints,
+                mGradientColor,
+                mSliderSpacing,
+                this,
+                sliderAlphaValue,
+                mThumbColorFilter,
+                mSliderColorFilter,
                 mSliderID
             )
-        mSliderFrameLayout.addView(
-            mPolylineSliderGraph,
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        )
 
-        val mXAxis = XAxis(
-            context,
-            mNumberOfDataPoints,
-            mSliderSpacing,
-            "Hrs",
-            mTextViewID
-        )
+        mYAxis = findViewById(R.id.polyline_y_axis)
+        mYAxis.setNumberOfItems(mNumberOfDataPoints)
+        mYAxis.setItemSpacing(mSliderSpacing)
+        mYAxis.setUnit("%")
+        mYAxis.setItemViewIDArray(mPercentageViewID)
+        mYAxis.setAdapter(Y_AXIS_TYPE, 50)
+        mYAxis.setLayout()
 
-        mXAxisFrameLayout.addView(
-            mXAxis,
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-        )
-
+        mXAxis = findViewById(R.id.polyline_x_axis)
+        mXAxis.setNumberOfItems(mNumberOfDataPoints)
+        mXAxis.setItemSpacing(mSliderSpacing)
+        mXAxis.setUnit("Hrs")
+        mXAxis.setItemViewIDArray(mTextViewID)
+        mXAxis.setAdapter(X_AXIS_TYPE, 0)
         mXAxis.setLayout()
-        mXAxis.setAdapter()
 
-        mXAxis.post {
-            mPolylineSliderGraph.setAdapter()
-            mPolylineSliderGraph.setLayoutParams()
-            mPolylineSliderGraph.post {
-                mPolylineSliderGraph.initiatePostSequence()
-            }
+        mSlider.setAdapter()
+        mSlider.setLayoutParams()
+        mSlider.post {
+            mSlider.initiatePostSequence()
         }
     }
 
@@ -166,34 +157,21 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         return if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT) {
             val numberOfSlidersInView = 5
             if (numberOfPoints >= numberOfSlidersInView) {
-                mViewWidth / numberOfSlidersInView
+                measuredWidth / numberOfSlidersInView
             } else {
-                mViewWidth / numberOfPoints
+                measuredWidth / numberOfPoints
             }
         } else {
-            mViewWidth / numberOfPoints
+            measuredWidth / numberOfPoints
         }
     }
 
     internal fun performViewScroll(scrollingValue: Int) {
-        (mXAxisFrameLayout.getChildAt(0) as XAxis).scrollBy(scrollingValue, 0)
-        yAxisSlider.visibility = false
+        mXAxis.scrollBy(scrollingValue, 0)
+        mYAxis.scrollBy(scrollingValue, 0)
     }
 
-    internal fun displayYAxisProgress(position: Int, progress: Int) {
-        yAxisSlider.setSliderProgress(progress)
-    }
-
-    internal fun changeSliderAlpha(progress: Int, code: Int) {
-        when (code) {
-            0 -> {
-                yAxisSlider.visibility = false
-            }
-
-            1 -> {
-                yAxisSlider.setSliderProgress(progress)
-                yAxisSlider.visibility = true
-            }
-        }
+    internal fun changeYAxisProgress(position: Int, progress: Int) {
+        mYAxis.changeYAxisProgress(position, progress)
     }
 }

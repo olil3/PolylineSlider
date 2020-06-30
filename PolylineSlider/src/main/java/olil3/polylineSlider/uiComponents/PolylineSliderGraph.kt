@@ -8,24 +8,24 @@ import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuffColorFilter
 import android.graphics.Shader
+import android.util.AttributeSet
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import olil3.polylineSlider.PolylineSlider
 import olil3.polylineSlider.utils.EPointF
 import olil3.polylineSlider.utils.PolyBezierPathUtil
+import olil3.polylineSlider.utils.VerticalSlider
 
-internal class PolylineSliderGraph(
-    mContext: Context,
-    private val mNumberOfDataPoints: Int,
-    private val mGradientColor: Int,
-    private val mSliderSpacing: Int,
-    private val mPolylineSlider: PolylineSlider,
-    private val mSliderAlphaVal: Int,
-    private val mThumbColorFilter: PorterDuffColorFilter,
-    private val mSliderColorFilter: PorterDuffColorFilter,
-    private val mSliderWrapperID: IntArray
-) : RecyclerView(mContext) {
+internal class PolylineSliderGraph : RecyclerView {
+    private var mNumberOfDataPoints: Int = 0
+    private var mGradientColor: Int = 0
+    private var mSliderSpacing: Int = 0
+    private lateinit var mPolylineSlider: PolylineSlider
+    private var mSliderAlphaVal: Int = 0
+    private lateinit var mThumbColorFilter: PorterDuffColorFilter
+    private lateinit var mSliderColorFilter: PorterDuffColorFilter
+    private lateinit var mSliderWrapperID: IntArray
 
     private lateinit var mInitialEPointF: EPointF
     private lateinit var mEPointFXVal: FloatArray
@@ -38,9 +38,47 @@ internal class PolylineSliderGraph(
     private var mViewHeight: Int = 0
     private var isLayout = false
 
-    init {
+    constructor(mContext: Context, attributeSet: AttributeSet?, defAttributeStyle: Int) : super(
+        mContext,
+        attributeSet,
+        defAttributeStyle
+    ) {
         setWillNotDraw(false)
         overScrollMode = View.OVER_SCROLL_NEVER
+    }
+
+    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
+    constructor(mContext: Context) : this(mContext, null, 0)
+
+    fun initParams(
+        mNumberOfItems: Int,
+        mGradientCol: Int,
+        mItemSpacing: Int,
+        mParentPolylineSlider: PolylineSlider,
+        mSliderAlpha: Int,
+        mThumbColor: PorterDuffColorFilter,
+        mSliderColor: PorterDuffColorFilter,
+        mSliderViewID: IntArray
+    ) {
+        mNumberOfDataPoints = mNumberOfItems
+        mGradientColor = mGradientCol
+        mSliderSpacing = mItemSpacing
+        mPolylineSlider = mParentPolylineSlider
+        mSliderAlphaVal = mSliderAlpha
+        mThumbColorFilter = mThumbColor
+        mSliderColorFilter = mSliderColor
+        mSliderWrapperID = mSliderViewID
+
+        mGradientPaint.shader = LinearGradient(
+            0f,
+            0f,
+            0f,
+            mViewHeight.toFloat(),
+            mGradientColor,
+            Color.TRANSPARENT,
+            Shader.TileMode.MIRROR
+        )
+        invalidate()
     }
 
     fun setLayoutParams() {
@@ -68,15 +106,6 @@ internal class PolylineSliderGraph(
         if (changed) {
             mViewHeight = height
             mViewWidth = width
-            mGradientPaint.shader = LinearGradient(
-                0f,
-                0f,
-                0f,
-                mViewHeight.toFloat(),
-                mGradientColor,
-                Color.TRANSPARENT,
-                Shader.TileMode.MIRROR
-            )
             isLayout = changed
         }
     }
@@ -148,11 +177,7 @@ internal class PolylineSliderGraph(
         mPolylineSlider.updateText(position, code)
     }
 
-    internal fun displayYAxisProgress(position: Int, progress: Int) {
-        mPolylineSlider.displayYAxisProgress(position, progress)
-    }
-
-    internal fun changeSliderAlpha(progress: Int, code: Int) {
-        mPolylineSlider.changeSliderAlpha(progress, code)
+    fun displayYAxisProgress(position: Int, progress: Int) {
+        mPolylineSlider.changeYAxisProgress(position, progress)
     }
 }
