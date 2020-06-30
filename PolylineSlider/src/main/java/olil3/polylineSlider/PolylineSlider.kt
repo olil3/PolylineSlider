@@ -21,15 +21,20 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     private lateinit var mSlider: PolylineSliderGraph
     private lateinit var mXAxis: Axis
     private lateinit var mYAxis: Axis
-    private var mNumberOfDataPoints = 0
+    private var mNumberOfDataPoints = 1
     private var sliderAlphaValue: Int = 0
     private var mThumbColor: Int = 0
-    private var mGradientColor: Int = 0
+    private var mGradientColor: Int = Color.rgb(238, 130, 238)
     private var mSliderSpacing: Int = 0
     private var isUIInitialized = false
-    private var mTextViewID: IntArray
-    private var mSliderID: IntArray
-    private var mPercentageViewID: IntArray
+    private var mXAxisTextViewIDs: IntArray
+    private var mVerticalSliderIDs: IntArray
+    private var mYAxisTextViewIDs: IntArray
+    private var mXAxisUnit: String = ""
+    private var mYAxisUnit: String = ""
+    private var mYAxisMaxValue: Int = 100
+    private var mYAxisMinValue: Int = 0
+    private var mYAxisInitialValue: Int = 50
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -55,9 +60,27 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                     attributes.getInt(R.styleable.PolylineSlider_thumb_color, Color.MAGENTA)
                 mGradientColor =
                     attributes.getColor(
-                        R.styleable.PolylineSlider_gradient_color,
-                        Color.rgb(238, 130, 238)
+                        R.styleable.PolylineSlider_gradient_color, Color.rgb(238, 130, 238)
                     )
+                mXAxisUnit = if (attributes.getString(R.styleable.PolylineSlider_x_axis_unit)
+                        .toString() == "null"
+                ) {
+                    ""
+                } else {
+                    attributes.getString(R.styleable.PolylineSlider_x_axis_unit).toString()
+                }
+
+                mYAxisUnit = if (attributes.getString(R.styleable.PolylineSlider_y_axis_unit)
+                        .toString() == "null"
+                ) {
+                    ""
+                } else {
+                    attributes.getString(R.styleable.PolylineSlider_y_axis_unit).toString()
+                }
+                mYAxisMaxValue = attributes.getInt(R.styleable.PolylineSlider_y_axis_max_value, 100)
+                mYAxisMinValue = attributes.getInt(R.styleable.PolylineSlider_y_axis_min_value, 0)
+                mYAxisInitialValue =
+                    attributes.getInt(R.styleable.PolylineSlider_y_axis_initial_value, 50)
             } catch (error: Exception) {
                 Log.e("PolylineSlider init err", error.message!!)
                 throw error
@@ -69,9 +92,9 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 throw IllegalArgumentException(mContext.resources.getString(R.string.invalid_number_of_data_points))
             }
         }
-        mTextViewID = IntArray(mNumberOfDataPoints)
-        mSliderID = IntArray(mNumberOfDataPoints)
-        mPercentageViewID = IntArray(mNumberOfDataPoints)
+        mXAxisTextViewIDs = IntArray(mNumberOfDataPoints)
+        mVerticalSliderIDs = IntArray(mNumberOfDataPoints)
+        mYAxisTextViewIDs = IntArray(mNumberOfDataPoints)
     }
 
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0) {
@@ -108,22 +131,22 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 sliderAlphaValue,
                 mThumbColorFilter,
                 mSliderColorFilter,
-                mSliderID
+                mVerticalSliderIDs
             )
 
         mYAxis = findViewById(R.id.polyline_y_axis)
         mYAxis.setNumberOfItems(mNumberOfDataPoints)
         mYAxis.setItemSpacing(mSliderSpacing)
-        mYAxis.setUnit("%")
-        mYAxis.setItemViewIDArray(mPercentageViewID)
+        mYAxis.setUnit(mYAxisUnit)
+        mYAxis.setItemViewIDArray(mYAxisTextViewIDs)
         mYAxis.setAdapter(Y_AXIS_TYPE, 50)
         mYAxis.setLayout()
 
         mXAxis = findViewById(R.id.polyline_x_axis)
         mXAxis.setNumberOfItems(mNumberOfDataPoints)
         mXAxis.setItemSpacing(mSliderSpacing)
-        mXAxis.setUnit("Hrs")
-        mXAxis.setItemViewIDArray(mTextViewID)
+        mXAxis.setUnit(mXAxisUnit)
+        mXAxis.setItemViewIDArray(mXAxisTextViewIDs)
         mXAxis.setAdapter(X_AXIS_TYPE, 0)
         mXAxis.setLayout()
 
@@ -138,14 +161,15 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         when (code) {
             0 -> {
                 try {
-                    findViewById<TextView>(mTextViewID[position]).typeface = Typeface.DEFAULT
+                    findViewById<TextView>(mXAxisTextViewIDs[position]).typeface = Typeface.DEFAULT
                 } catch (e: Exception) {
                     Log.e("Exception Class", "${e.message}")
                 }
             }
             1 -> {
                 try {
-                    findViewById<TextView>(mTextViewID[position]).typeface = Typeface.DEFAULT_BOLD
+                    findViewById<TextView>(mXAxisTextViewIDs[position]).typeface =
+                        Typeface.DEFAULT_BOLD
                 } catch (e: Exception) {
                     Log.e("Exception Class", "${e.message}")
                 }
