@@ -14,9 +14,7 @@ internal class XAxisAdapter(
     private val mUnit: String,
     private val mTextBoxViewIDs: IntArray
 ) : RecyclerView.Adapter<XAxisAdapter.TextBoxViewHolder>() {
-    class TextBoxViewHolder(mTextBox: TextView) : RecyclerView.ViewHolder(mTextBox) {
-        val mTextView = mTextBox
-    }
+    class TextBoxViewHolder(val mTextBox: TextView) : RecyclerView.ViewHolder(mTextBox)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TextBoxViewHolder {
         val mTextBox = TextView(mContext)
@@ -36,8 +34,8 @@ internal class XAxisAdapter(
     }
 
     override fun onBindViewHolder(holder: TextBoxViewHolder, position: Int) {
-        holder.mTextView.text = (position.toString() + mUnit)
-        mTextBoxViewIDs[position] = holder.mTextView.id
+        holder.mTextBox.text = (position.toString() + mUnit)
+        mTextBoxViewIDs[position] = holder.mTextBox.id
     }
 
     override fun getItemId(position: Int): Long {
