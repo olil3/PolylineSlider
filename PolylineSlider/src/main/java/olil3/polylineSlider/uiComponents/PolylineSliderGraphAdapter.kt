@@ -15,6 +15,7 @@ internal class PolylineSliderGraphAdapter(
     private val mNumberOfDataPoints: Int,
     private val mSliderSpacing: Int,
     private val mSliderAlphaVal: Int,
+    private val mSliderInitialVal: Int,
     private val mThumbColorFilter: PorterDuffColorFilter,
     private val mSliderColorFilter: PorterDuffColorFilter,
     private val mSliderWrapperIDArray: IntArray,
@@ -57,6 +58,8 @@ internal class PolylineSliderGraphAdapter(
         mVerticalSlider.sliderAlpha = mSliderAlphaVal
         mVerticalSlider.thumbColor = mThumbColorFilter
         mVerticalSlider.sliderColor = mSliderColorFilter
+        mVerticalSlider.sliderMax = 100
+        mVerticalSlider.sliderProgress = mSliderInitialVal
         return (VerticalSeekBarObject(
             mVerticalSlider
         ))

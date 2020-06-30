@@ -133,6 +133,7 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 mSliderSpacing,
                 this,
                 sliderAlphaValue,
+                mYAxisInitialValue,
                 mThumbColorFilter,
                 mSliderColorFilter,
                 mVerticalSliderIDs
@@ -143,7 +144,7 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         mYAxis.setItemSpacing(mSliderSpacing)
         mYAxis.setUnit(mYAxisUnit)
         mYAxis.setItemViewIDArray(mYAxisTextViewIDs)
-        mYAxis.setAdapter(Y_AXIS_TYPE, 50)
+        mYAxis.setAdapter(Y_AXIS_TYPE, mYAxisInitialValue)
         mYAxis.setLayout()
 
         mXAxis = findViewById(R.id.polyline_x_axis)

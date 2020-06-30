@@ -37,6 +37,7 @@ internal class PolylineSliderGraph : RecyclerView {
     private var mViewWidth: Int = 0
     private var mViewHeight: Int = 0
     private var isLayout = false
+    private var mSliderInitialVal: Int = 0
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defAttributeStyle: Int) : super(
         mContext,
@@ -56,6 +57,7 @@ internal class PolylineSliderGraph : RecyclerView {
         mItemSpacing: Int,
         mParentPolylineSlider: PolylineSlider,
         mSliderAlpha: Int,
+        mSliderInitVal: Int,
         mThumbColor: PorterDuffColorFilter,
         mSliderColor: PorterDuffColorFilter,
         mSliderViewID: IntArray
@@ -65,6 +67,7 @@ internal class PolylineSliderGraph : RecyclerView {
         mSliderSpacing = mItemSpacing
         mPolylineSlider = mParentPolylineSlider
         mSliderAlphaVal = mSliderAlpha
+        mSliderInitialVal = mSliderInitVal
         mThumbColorFilter = mThumbColor
         mSliderColorFilter = mSliderColor
         mSliderWrapperID = mSliderViewID
@@ -93,6 +96,7 @@ internal class PolylineSliderGraph : RecyclerView {
                 mNumberOfDataPoints,
                 mSliderSpacing,
                 mSliderAlphaVal,
+                mSliderInitialVal,
                 mThumbColorFilter,
                 mSliderColorFilter,
                 mSliderWrapperID,
