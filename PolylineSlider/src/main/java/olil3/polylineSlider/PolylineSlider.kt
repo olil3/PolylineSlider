@@ -128,18 +128,24 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
 
         mSliderComponent = findViewById(R.id.polyline_slider_graph)
         mYAxis = findViewById(R.id.polyline_y_axis)
-        mYAxis.setNumberOfItems(mNumberOfDataPoints)
-        mYAxis.setItemSpacing(mSliderSpacing)
-        mYAxis.setUnit(mYAxisUnit)
-        mYAxis.setItemViewIDArray(mYAxisTextViewIDs)
-        mYAxis.setParent(this)
-        mYAxis.setVerticalSliderViewIDArray(mVerticalSliderIDs)
+        mYAxis.initParams(
+            this,
+            mNumberOfDataPoints,
+            mYAxisUnit,
+            mYAxisTextViewIDs,
+            mSliderSpacing,
+            mVerticalSliderIDs
+        )
 
         mXAxis = findViewById(R.id.polyline_x_axis)
-        mXAxis.setNumberOfItems(mNumberOfDataPoints)
-        mXAxis.setItemSpacing(mSliderSpacing)
-        mXAxis.setUnit(mXAxisUnit)
-        mXAxis.setItemViewIDArray(mXAxisTextViewIDs)
+        mXAxis.initParams(
+            this,
+            mNumberOfDataPoints,
+            mXAxisUnit,
+            mXAxisTextViewIDs,
+            mSliderSpacing,
+            mVerticalSliderIDs
+        )
 
         mSliderComponent
             .initParams(
@@ -166,7 +172,7 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         }
     }
 
-    fun updateText(position: Int, code: Int) {
+    internal fun updateText(position: Int, code: Int) {
         when (code) {
             ON_TOUCH_UP -> {
                 try {
@@ -202,12 +208,12 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         }
     }
 
-    fun performViewScroll(scrollingValue: Int) {
+    internal fun performViewScroll(scrollingValue: Int) {
         mXAxis.scrollBy(scrollingValue, 0)
         mYAxis.scrollBy(scrollingValue, 0)
     }
 
-    fun changeYAxisProgress(position: Int, progress: Int) {
+    internal fun changeYAxisProgress(position: Int, progress: Int) {
         mYAxis.changeYAxisProgress(position, progress)
     }
 
@@ -217,7 +223,7 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         mSliderComponent.updateLayout(mSliderSpacing)
     }
 
-    fun getSliderProgressValue(position: Int): Int {
+    internal fun getSliderProgressValue(position: Int): Int {
         val mVerticalSlider = findViewById<VerticalSeekBarWrapper>(mVerticalSliderIDs[position])
         return mVerticalSlider.sliderProgress
     }

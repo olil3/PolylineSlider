@@ -67,24 +67,20 @@ internal class Axis : RecyclerView {
         return true
     }
 
-    fun setParent(mPolylineSlider: PolylineSlider) {
+    fun initParams(
+        mPolylineSlider: PolylineSlider,
+        mNumberOfItems: Int,
+        mUnit: String,
+        mViewIDArray: IntArray,
+        mItemSpacing: Int,
+        mArray: IntArray
+    ) {
         mParentPolylineSlider = mPolylineSlider
-    }
-
-    fun setNumberOfItems(mNumberOfItems: Int) {
         mNumberOfTextBoxes = mNumberOfItems
-    }
-
-    fun setUnit(mUnit: String) {
         mAxisUnit = mUnit
-    }
-
-    fun setItemViewIDArray(mViewIDArray: IntArray) {
         mTextBoxID = mViewIDArray
-    }
-
-    fun setItemSpacing(mItemSpacing: Int) {
         mTextBoxSpacing = mItemSpacing
+        mSliderViewIDArray = mArray
     }
 
     fun changeYAxisProgress(position: Int, progress: Int) {
@@ -99,10 +95,6 @@ internal class Axis : RecyclerView {
             findViewById<TextView>(viewIDs).layoutParams.width = newSliderSpacing
         }
         requestLayout()
-    }
-
-    fun setVerticalSliderViewIDArray(mArray: IntArray) {
-        mSliderViewIDArray = mArray
     }
 
     fun getSliderProgress(position: Int): Int {
