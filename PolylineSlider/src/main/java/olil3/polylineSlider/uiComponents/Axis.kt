@@ -32,12 +32,7 @@ internal class Axis : RecyclerView {
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
     constructor(mContext: Context) : this(mContext, null, 0)
 
-    fun setLayout() {
-        val mLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        layoutManager = mLayoutManager
-    }
-
-    fun setAdapter(mType: Int) {
+    fun setAdapterAndLayout(mType: Int) {
         if (!(mType == X_AXIS_TYPE || mType == Y_AXIS_TYPE)) {
             throw IllegalArgumentException("Invalid AXIS TYPE!")
         }
@@ -61,6 +56,7 @@ internal class Axis : RecyclerView {
                 mTextBoxID
             )
         }
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

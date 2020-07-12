@@ -162,11 +162,9 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
 
         mSliderComponent.post {
             mSliderComponent.initiatePostSequence()
-            mYAxis.setAdapter(Y_AXIS_TYPE)
-            mYAxis.setLayout()
+            mYAxis.setAdapterAndLayout(Y_AXIS_TYPE)
 
-            mXAxis.setAdapter(X_AXIS_TYPE)
-            mXAxis.setLayout()
+            mXAxis.setAdapterAndLayout(X_AXIS_TYPE)
         }
     }
 
