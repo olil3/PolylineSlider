@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import olil3.polylineSlider.PolylineSlider
 import olil3.polylineSlider.utils.EPointF
 import olil3.polylineSlider.utils.PolyBezierPathUtil
-import olil3.polylineSlider.utils.VerticalSlider
+import olil3.polylineSlider.utils.VerticalSeekBarWrapper
 
 internal class PolylineSliderGraph : RecyclerView {
     private var mNumberOfDataPoints: Int = 0
@@ -121,7 +121,7 @@ internal class PolylineSliderGraph : RecyclerView {
         mPathPaint.strokeWidth = 5f
         mPathPaint.color = Color.MAGENTA
         mInitialEPointF =
-            (this.getChildAt(0) as VerticalSlider).getSliderCoordinates()
+            (this.getChildAt(0) as VerticalSeekBarWrapper).getSliderCoordinates()
 
         for (addBasePoints in 0 until mNumberOfDataPoints) {
             mEPointFXVal[addBasePoints] = mInitialEPointF.x + (addBasePoints * mSliderSpacing)
@@ -171,7 +171,7 @@ internal class PolylineSliderGraph : RecyclerView {
         }
     }
 
-    fun updateSliderParams(mVerticalSlider: VerticalSlider, position: Int) {
+    fun updateSliderParams(mVerticalSlider: VerticalSeekBarWrapper, position: Int) {
         val yVal = mVerticalSlider.getSliderCoordinates().y
         mEPointFYVal[position] = yVal
         invalidate()
@@ -187,7 +187,7 @@ internal class PolylineSliderGraph : RecyclerView {
 
     fun updateLayout(newSliderSpacing: Int) {
         for (viewIDs in mSliderWrapperID) {
-            findViewById<VerticalSlider>(viewIDs).layoutParams.width = newSliderSpacing
+            findViewById<VerticalSeekBarWrapper>(viewIDs).layoutParams.width = newSliderSpacing
         }
         requestLayout()
     }

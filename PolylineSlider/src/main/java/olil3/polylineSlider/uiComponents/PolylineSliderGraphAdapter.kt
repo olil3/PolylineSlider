@@ -8,7 +8,7 @@ import android.widget.SeekBar
 import androidx.recyclerview.widget.RecyclerView
 import olil3.polylineSlider.ON_TOUCH_DOWN
 import olil3.polylineSlider.ON_TOUCH_UP
-import olil3.polylineSlider.utils.VerticalSlider
+import olil3.polylineSlider.utils.VerticalSeekBarWrapper
 
 internal class PolylineSliderGraphAdapter(
     private val mParentRecyclerView: PolylineSliderGraph,
@@ -28,7 +28,7 @@ internal class PolylineSliderGraphAdapter(
 
     override fun onBindViewHolder(holder: VerticalSeekBarObject, position: Int) {
         mSliderWrapperIDArray[position] = holder.mVerticalSlider.id
-        val mVerticalSliderSeekBar = holder.mVerticalSlider.getSeekBarObject()
+        val mVerticalSliderSeekBar = holder.mVerticalSlider.childSeekBar
         mVerticalSliderSeekBar
             .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
@@ -51,7 +51,7 @@ internal class PolylineSliderGraphAdapter(
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerticalSeekBarObject {
-        val mVerticalSlider = VerticalSlider(mContext)
+        val mVerticalSlider = VerticalSeekBarWrapper(mContext)
         mVerticalSlider.layoutParams =
             RecyclerView.LayoutParams(mSliderSpacing, RecyclerView.LayoutParams.MATCH_PARENT)
         mVerticalSlider.id = View.generateViewId()
@@ -73,6 +73,6 @@ internal class PolylineSliderGraphAdapter(
         return position
     }
 
-    class VerticalSeekBarObject(val mVerticalSlider: VerticalSlider) :
+    class VerticalSeekBarObject(val mVerticalSlider: VerticalSeekBarWrapper) :
         RecyclerView.ViewHolder(mVerticalSlider)
 }

@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import olil3.polylineSlider.uiComponents.Axis
 import olil3.polylineSlider.uiComponents.PolylineSliderGraph
-import olil3.polylineSlider.utils.VerticalSlider
+import olil3.polylineSlider.utils.VerticalSeekBarWrapper
 
 internal const val X_AXIS_TYPE = 1000
 internal const val Y_AXIS_TYPE = 2000
@@ -218,7 +218,7 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     }
 
     fun getSliderProgressValue(position: Int): Int {
-        val mVerticalSlider = findViewById<VerticalSlider>(mVerticalSliderIDs[position])
+        val mVerticalSlider = findViewById<VerticalSeekBarWrapper>(mVerticalSliderIDs[position])
         return mVerticalSlider.sliderProgress
     }
 }
