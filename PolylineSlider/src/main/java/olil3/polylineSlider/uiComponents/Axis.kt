@@ -36,6 +36,7 @@ internal class Axis : RecyclerView {
         if (!(mType == X_AXIS_TYPE || mType == Y_AXIS_TYPE)) {
             throw IllegalArgumentException("Invalid AXIS TYPE!")
         }
+        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         adapter = if (mType == X_AXIS_TYPE) {
             mAxisType = X_AXIS_TYPE
             XAxisAdapter(
@@ -56,7 +57,6 @@ internal class Axis : RecyclerView {
                 mTextBoxID
             )
         }
-        layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
     }
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {

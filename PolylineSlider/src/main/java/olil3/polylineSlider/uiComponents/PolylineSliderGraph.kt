@@ -81,6 +81,7 @@ internal class PolylineSliderGraph : RecyclerView {
             Color.TRANSPARENT,
             Shader.TileMode.MIRROR
         )
+        this.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         this.adapter = PolylineSliderGraphAdapter(
             this,
             mNumberOfDataPoints,
@@ -92,7 +93,6 @@ internal class PolylineSliderGraph : RecyclerView {
             mSliderWrapperID,
             context
         )
-        this.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         invalidate()
     }
 
