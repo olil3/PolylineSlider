@@ -81,28 +81,19 @@ internal class PolylineSliderGraph : RecyclerView {
             Color.TRANSPARENT,
             Shader.TileMode.MIRROR
         )
+        this.adapter = PolylineSliderGraphAdapter(
+            this,
+            mNumberOfDataPoints,
+            mSliderSpacing,
+            mSliderAlphaVal,
+            mSliderInitialVal,
+            mThumbColorFilter,
+            mSliderColorFilter,
+            mSliderWrapperID,
+            context
+        )
+        this.layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         invalidate()
-    }
-
-    fun setLayoutParams() {
-        val mLayoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
-        this.layoutManager = mLayoutManager
-    }
-
-    fun setAdapter() {
-        val mAdapter =
-            PolylineSliderGraphAdapter(
-                this,
-                mNumberOfDataPoints,
-                mSliderSpacing,
-                mSliderAlphaVal,
-                mSliderInitialVal,
-                mThumbColorFilter,
-                mSliderColorFilter,
-                mSliderWrapperID,
-                context
-            )
-        this.adapter = mAdapter
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {

@@ -160,8 +160,6 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 mGradientColor
             )
 
-        mSliderComponent.setAdapter()
-        mSliderComponent.setLayoutParams()
         mSliderComponent.post {
             mSliderComponent.initiatePostSequence()
             mYAxis.setAdapter(Y_AXIS_TYPE)
