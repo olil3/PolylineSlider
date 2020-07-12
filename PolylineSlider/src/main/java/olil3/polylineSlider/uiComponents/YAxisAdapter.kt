@@ -8,11 +8,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 internal class YAxisAdapter(
+    private val mParentAxis: Axis,
     private val mContext: Context,
     private val mNumberOfTextBoxes: Int,
     private val mTextBoxSpacing: Int,
     private val mUnit: String,
-    private val initialValue: Int,
     private val mTextBoxViewIDs: IntArray
 ) : RecyclerView.Adapter<YAxisAdapter.YAxisValueTextViewHolder>() {
     class YAxisValueTextViewHolder(val mValueTextView: TextView) :
@@ -34,7 +34,7 @@ internal class YAxisAdapter(
 
     override fun onBindViewHolder(holder: YAxisValueTextViewHolder, position: Int) {
         mTextBoxViewIDs[position] = holder.mValueTextView.id
-        holder.mValueTextView.text = ((initialValue).toString() + mUnit)
+        holder.mValueTextView.text = (mParentAxis.getSliderProgress(position).toString() + mUnit)
     }
 
     override fun getItemId(position: Int): Long {

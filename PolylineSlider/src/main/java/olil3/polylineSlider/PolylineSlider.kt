@@ -13,6 +13,7 @@ import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import olil3.polylineSlider.uiComponents.Axis
 import olil3.polylineSlider.uiComponents.PolylineSliderGraph
+import olil3.polylineSlider.utils.VerticalSlider
 
 internal const val X_AXIS_TYPE = 1000
 internal const val Y_AXIS_TYPE = 2000
@@ -126,6 +127,20 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         val mSliderColorFilter = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
 
         mSliderComponent = findViewById(R.id.polyline_slider_graph)
+        mYAxis = findViewById(R.id.polyline_y_axis)
+        mYAxis.setNumberOfItems(mNumberOfDataPoints)
+        mYAxis.setItemSpacing(mSliderSpacing)
+        mYAxis.setUnit(mYAxisUnit)
+        mYAxis.setItemViewIDArray(mYAxisTextViewIDs)
+        mYAxis.setParent(this)
+        mYAxis.setVerticalSliderViewIDArray(mVerticalSliderIDs)
+
+        mXAxis = findViewById(R.id.polyline_x_axis)
+        mXAxis.setNumberOfItems(mNumberOfDataPoints)
+        mXAxis.setItemSpacing(mSliderSpacing)
+        mXAxis.setUnit(mXAxisUnit)
+        mXAxis.setItemViewIDArray(mXAxisTextViewIDs)
+
         mSliderComponent
             .initParams(
                 mNumberOfDataPoints,
@@ -139,26 +154,15 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 mVerticalSliderIDs
             )
 
-        mYAxis = findViewById(R.id.polyline_y_axis)
-        mYAxis.setNumberOfItems(mNumberOfDataPoints)
-        mYAxis.setItemSpacing(mSliderSpacing)
-        mYAxis.setUnit(mYAxisUnit)
-        mYAxis.setItemViewIDArray(mYAxisTextViewIDs)
-        mYAxis.setAdapter(Y_AXIS_TYPE, mYAxisInitialValue)
-        mYAxis.setLayout()
-
-        mXAxis = findViewById(R.id.polyline_x_axis)
-        mXAxis.setNumberOfItems(mNumberOfDataPoints)
-        mXAxis.setItemSpacing(mSliderSpacing)
-        mXAxis.setUnit(mXAxisUnit)
-        mXAxis.setItemViewIDArray(mXAxisTextViewIDs)
-        mXAxis.setAdapter(X_AXIS_TYPE, 0)
-        mXAxis.setLayout()
-
         mSliderComponent.setAdapter()
         mSliderComponent.setLayoutParams()
         mSliderComponent.post {
             mSliderComponent.initiatePostSequence()
+            mYAxis.setAdapter(Y_AXIS_TYPE)
+            mYAxis.setLayout()
+
+            mXAxis.setAdapter(X_AXIS_TYPE)
+            mXAxis.setLayout()
         }
     }
 
@@ -211,5 +215,10 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         mYAxis.updateLayout(mSliderSpacing)
         mXAxis.updateLayout(mSliderSpacing)
         mSliderComponent.updateLayout(mSliderSpacing)
+    }
+
+    fun getSliderProgressValue(position: Int): Int {
+        val mVerticalSlider = findViewById<VerticalSlider>(mVerticalSliderIDs[position])
+        return mVerticalSlider.sliderProgress
     }
 }

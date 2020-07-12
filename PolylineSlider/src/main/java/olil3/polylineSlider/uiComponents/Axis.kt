@@ -7,15 +7,18 @@ import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import olil3.polylineSlider.PolylineSlider
 import olil3.polylineSlider.X_AXIS_TYPE
 import olil3.polylineSlider.Y_AXIS_TYPE
 
 internal class Axis : RecyclerView {
+    private lateinit var mParentPolylineSlider: PolylineSlider
     private var mNumberOfTextBoxes: Int = 0
     private var mTextBoxSpacing: Int = 0
     private lateinit var mAxisUnit: String
     private lateinit var mTextBoxID: IntArray
     private var mAxisType: Int = 0
+    private lateinit var mSliderViewIDArray: IntArray
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defAttributeStyle: Int) : super(
         mContext,
@@ -34,7 +37,7 @@ internal class Axis : RecyclerView {
         layoutManager = mLayoutManager
     }
 
-    fun setAdapter(mType: Int, mInitialValue: Int) {
+    fun setAdapter(mType: Int) {
         if (!(mType == X_AXIS_TYPE || mType == Y_AXIS_TYPE)) {
             throw IllegalArgumentException("Invalid AXIS TYPE!")
         }
@@ -50,11 +53,11 @@ internal class Axis : RecyclerView {
         } else {
             mAxisType = Y_AXIS_TYPE
             YAxisAdapter(
+                this,
                 context,
                 mNumberOfTextBoxes,
                 mTextBoxSpacing,
                 mAxisUnit,
-                mInitialValue,
                 mTextBoxID
             )
         }
@@ -62,6 +65,10 @@ internal class Axis : RecyclerView {
 
     override fun dispatchTouchEvent(ev: MotionEvent?): Boolean {
         return true
+    }
+
+    fun setParent(mPolylineSlider: PolylineSlider) {
+        mParentPolylineSlider = mPolylineSlider
     }
 
     fun setNumberOfItems(mNumberOfItems: Int) {
@@ -92,5 +99,13 @@ internal class Axis : RecyclerView {
             findViewById<TextView>(viewIDs).layoutParams.width = newSliderSpacing
         }
         requestLayout()
+    }
+
+    fun setVerticalSliderViewIDArray(mArray: IntArray) {
+        mSliderViewIDArray = mArray
+    }
+
+    fun getSliderProgress(position: Int): Int {
+        return mParentPolylineSlider.getSliderProgressValue(position)
     }
 }
