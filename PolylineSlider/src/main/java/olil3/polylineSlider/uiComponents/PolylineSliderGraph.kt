@@ -140,7 +140,8 @@ internal class PolylineSliderGraph : RecyclerView {
                     mEPointFXVal,
                     mEPointFYVal,
                     mInitialEPointF.y,
-                    computeHorizontalScrollRange() - computeHorizontalScrollOffset(),
+                    computeHorizontalScrollRange(),
+                    computeHorizontalScrollOffset(),
                     mGradientPath
                 )
                 canvas?.clipRect(

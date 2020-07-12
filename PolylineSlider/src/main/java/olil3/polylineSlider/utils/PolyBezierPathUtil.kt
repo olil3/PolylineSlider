@@ -55,6 +55,7 @@ class PolyBezierPathUtil {
         yArray: FloatArray,
         mYInitialVal: Float,
         recyclerViewScrollRange: Int,
+        recyclerViewScrollOffset: Int,
         mGradientPath: Path
     ): Path {
         val listToReturn = mutableListOf<EPointF>()
@@ -68,11 +69,11 @@ class PolyBezierPathUtil {
         }
         listToReturn.add(
             0,
-            EPointF(0.0f, mYInitialVal)
+            EPointF(-recyclerViewScrollOffset.toFloat(), mYInitialVal)
         )
         listToReturn.add(
             EPointF(
-                recyclerViewScrollRange.toFloat(),
+                (recyclerViewScrollRange - recyclerViewScrollOffset).toFloat(),
                 mYInitialVal
             )
         )
