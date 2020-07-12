@@ -79,13 +79,6 @@ internal class Axis : RecyclerView {
         mSliderViewIDArray = mArray
     }
 
-    fun changeYAxisProgress(position: Int, progress: Int) {
-        if (adapter is YAxisAdapter) {
-            findViewById<TextView>((adapter as YAxisAdapter).getItemId(position).toInt()).text =
-                ((progress).toString() + mAxisUnit)
-        }
-    }
-
     fun updateLayout(newSliderSpacing: Int) {
         for (viewIDs in mTextBoxID) {
             findViewById<TextView>(viewIDs).layoutParams.width = newSliderSpacing

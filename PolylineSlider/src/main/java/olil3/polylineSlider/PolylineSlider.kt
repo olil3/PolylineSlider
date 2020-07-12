@@ -210,7 +210,12 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     }
 
     internal fun changeYAxisProgress(position: Int, progress: Int) {
-        mYAxis.changeYAxisProgress(position, progress)
+        try {
+            findViewById<TextView>(mYAxisTextViewIDs[position]).text =
+                ((progress).toString() + mXAxisUnit)
+        } catch (e: Exception) {
+            Log.e("YAxisProgressError", e.message!!)
+        }
     }
 
     private fun updateLayout() {
