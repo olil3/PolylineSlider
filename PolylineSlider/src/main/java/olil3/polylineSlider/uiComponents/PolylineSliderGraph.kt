@@ -52,15 +52,15 @@ internal class PolylineSliderGraph : RecyclerView {
     constructor(mContext: Context) : this(mContext, null, 0)
 
     fun initParams(
-        mNumberOfItems: Int,
-        mGradientCol: Int,
-        mItemSpacing: Int,
         mParentPolylineSlider: PolylineSlider,
-        mSliderAlpha: Int,
+        mNumberOfItems: Int,
+        mSliderViewIDArray: IntArray,
+        mItemSpacing: Int,
         mSliderInitVal: Int,
-        mThumbColor: PorterDuffColorFilter,
         mSliderColor: PorterDuffColorFilter,
-        mSliderViewID: IntArray
+        mSliderAlpha: Int,
+        mThumbColor: PorterDuffColorFilter,
+        mGradientCol: Int
     ) {
         mNumberOfDataPoints = mNumberOfItems
         mGradientColor = mGradientCol
@@ -70,7 +70,7 @@ internal class PolylineSliderGraph : RecyclerView {
         mSliderInitialVal = mSliderInitVal
         mThumbColorFilter = mThumbColor
         mSliderColorFilter = mSliderColor
-        mSliderWrapperID = mSliderViewID
+        mSliderWrapperID = mSliderViewIDArray
 
         mGradientPaint.shader = LinearGradient(
             0f,

@@ -149,15 +149,15 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
 
         mSliderComponent
             .initParams(
-                mNumberOfDataPoints,
-                mGradientColor,
-                mSliderSpacing,
                 this,
-                sliderAlphaValue,
+                mNumberOfDataPoints,
+                mVerticalSliderIDs,
+                mSliderSpacing,
                 mYAxisInitialValue,
-                mThumbColorFilter,
                 mSliderColorFilter,
-                mVerticalSliderIDs
+                sliderAlphaValue,
+                mThumbColorFilter,
+                mGradientColor
             )
 
         mSliderComponent.setAdapter()
