@@ -24,11 +24,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.ViewCompat
 
-class VerticalSeekBarWrapper(
-    context: Context,
-    attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
-) : FrameLayout(context, attrs, defStyleAttr) {
+class VerticalSeekBarWrapper : FrameLayout {
     private var mVerticalSeekBar: VerticalSeekBar = VerticalSeekBar(context)
     var thumbAlpha: Int
         get() {
@@ -78,7 +74,13 @@ class VerticalSeekBarWrapper(
             mVerticalSeekBar.max = value
         }
 
-    init {
+    constructor(mContext: Context) : this(mContext, null, 0)
+    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
+    constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
+        mContext,
+        attributeSet,
+        defStyleAttr
+    ) {
         mVerticalSeekBar.rotationAngle = VerticalSeekBar.ROTATION_ANGLE_CW_270
         this.addView(
             mVerticalSeekBar,

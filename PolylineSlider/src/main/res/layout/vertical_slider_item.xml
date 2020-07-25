@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <olil3.polylineSlider.utils.VerticalSeekBarWrapper
+        android:id="@+id/slider"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/x_axis_text"
+        android:layout_below="@+id/y_axis_text" />
+
+    <TextView
+        android:id="@+id/x_axis_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/axis_text_view_height"
+        android:layout_alignParentBottom="true"
+        android:text="" />
+
+    <TextView
+        android:id="@+id/y_axis_text"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/axis_text_view_height"
+        android:layout_alignParentTop="true"
+        android:text="" />
+</RelativeLayout>

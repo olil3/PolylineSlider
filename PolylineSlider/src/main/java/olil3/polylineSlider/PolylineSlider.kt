@@ -2,42 +2,47 @@ package olil3.polylineSlider
 
 import android.content.Context
 import android.content.res.Configuration
+import android.graphics.Canvas
 import android.graphics.Color
+import android.graphics.LinearGradient
+import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
-import android.graphics.Typeface
+import android.graphics.Rect
+import android.graphics.Shader
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
-import android.widget.TextView
+import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.constraintlayout.widget.ConstraintLayout
-import olil3.polylineSlider.uiComponents.Axis
-import olil3.polylineSlider.uiComponents.PolylineSliderGraph
-import olil3.polylineSlider.utils.VerticalSeekBarWrapper
-
-internal const val X_AXIS_TYPE = 1000
-internal const val Y_AXIS_TYPE = 2000
-internal const val ON_TOUCH_DOWN = 100
-internal const val ON_TOUCH_UP = 200
+import olil3.polylineSlider.utils.PolyBezierPathUtil
 
 class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     private lateinit var mSliderComponent: PolylineSliderGraph
-    private lateinit var mXAxis: Axis
-    private lateinit var mYAxis: Axis
-    private var mNumberOfDataPoints = 1
-    private var sliderAlphaValue: Int = 0
-    private var mThumbColor: Int = 0
-    private var mGradientColor: Int = Color.rgb(238, 130, 238)
+
+    private var mNumberOfDataPoints: Int = 1
     private var mSliderSpacing: Int = 0
-    private var isUIInitialized = false
-    private var mXAxisTextViewIDs: IntArray
-    private var mVerticalSliderIDs: IntArray
-    private var mYAxisTextViewIDs: IntArray
-    private var mXAxisUnit: String = ""
-    private var mYAxisUnit: String = ""
+    private val axisHeight: Float = context.resources.getDimension(R.dimen.axis_text_view_height)
     private var mYAxisMaxValue: Int = 100
     private var mYAxisMinValue: Int = 0
     private var mYAxisInitialValue: Int = 50
+
+    private var mXAxisUnit: String = ""
+    private var mYAxisUnit: String = ""
+
+    private var isUIInitialized: Boolean = false
+    private var mVerticalSliderIDs: IntArray
+
+    private var sliderAlphaValue: Int = 0
+    private var mThumbColor: Int = 0
+    private val mGradientPath: Path = Path()
+    private val mGradientPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
+    private var mGradientColor: Int = Color.rgb(238, 130, 238)
+
+    private val mBezierPathUtil: PolyBezierPathUtil = PolyBezierPathUtil()
+    private val mPathPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
@@ -45,8 +50,6 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         defStyleAttr
     ) {
         View.inflate(context, R.layout.polyline_slider, this)
-
-        /* As this layout acts as a housing for multiple subviews, disable drawing to avoid misuse of resources. */
         if (attributeSet != null) {
             val attributes = mContext.obtainStyledAttributes(
                 attributeSet,
@@ -95,9 +98,7 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 throw IllegalArgumentException(mContext.resources.getString(R.string.invalid_number_of_data_points))
             }
         }
-        mXAxisTextViewIDs = IntArray(mNumberOfDataPoints)
         mVerticalSliderIDs = IntArray(mNumberOfDataPoints)
-        mYAxisTextViewIDs = IntArray(mNumberOfDataPoints)
     }
 
     constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0) {
@@ -111,83 +112,94 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
+            mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
             if (!isUIInitialized) {
                 mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
                 objectInit()
                 isUIInitialized = true
-            } else {
-                mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
-                updateLayout()
             }
+        }
+    }
+
+    override fun dispatchDraw(canvas: Canvas?) {
+        canvas?.save()
+        canvas?.clipRect(
+            Rect(
+                0, axisHeight.toInt(), measuredWidth,
+                (measuredHeight - axisHeight).toInt()
+            )
+        )
+        drawPolyLine(canvas)
+        canvas?.restore()
+        canvas?.save()
+        canvas?.clipRect(Rect(0, 0, measuredWidth, measuredHeight))
+        super.dispatchDraw(canvas)
+        canvas?.restore()
+    }
+
+    private fun drawPolyLine(canvas: Canvas?) {
+        try {
+            if (mSliderComponent.isLayoutComplete()) {
+                mPathPaint.style = Paint.Style.STROKE
+                mPathPaint.strokeWidth = 5f
+                mPathPaint.color = Color.MAGENTA
+
+                val pathToDraw = mBezierPathUtil.computePathThroughKnots(
+                    mSliderComponent.getEPointFXArray()!!,
+                    mSliderComponent.getEPointFYArray()!!,
+                    mSliderComponent.getInitialEPointF().y,
+                    mSliderComponent.computeHorizontalScrollRange(),
+                    mSliderComponent.computeHorizontalScrollOffset(),
+                    mGradientPath
+                )
+                mGradientPath.lineTo(
+                    mSliderComponent.computeHorizontalScrollRange().toFloat(),
+                    measuredHeight.toFloat()
+                )
+                mGradientPath.lineTo(0.0f, measuredHeight.toFloat())
+                mGradientPath.lineTo(0.0f, mSliderComponent.getInitialEPointF().y)
+                canvas?.drawPath(mGradientPath, mGradientPaint)
+                canvas?.drawPath(pathToDraw, mPathPaint)
+            }
+        } catch (e: Exception) {
         }
     }
 
     private fun objectInit() {
         val mThumbColorFilter = PorterDuffColorFilter(mThumbColor, PorterDuff.Mode.SRC_ATOP)
         val mSliderColorFilter = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
-
-        mSliderComponent = findViewById(R.id.polyline_slider_graph)
-        mYAxis = findViewById(R.id.polyline_y_axis)
-        mYAxis.initParams(
-            this,
-            mNumberOfDataPoints,
-            mYAxisUnit,
-            mYAxisTextViewIDs,
-            mSliderSpacing,
-            mVerticalSliderIDs
+        mGradientPaint.shader = LinearGradient(
+            0f,
+            0f,
+            0f,
+            measuredHeight.toFloat(),
+            mGradientColor,
+            Color.TRANSPARENT,
+            Shader.TileMode.MIRROR
         )
 
-        mXAxis = findViewById(R.id.polyline_x_axis)
-        mXAxis.initParams(
+        mSliderComponent = PolylineSliderGraph(
+            context,
             this,
             mNumberOfDataPoints,
             mXAxisUnit,
-            mXAxisTextViewIDs,
+            mYAxisUnit,
+            mVerticalSliderIDs,
             mSliderSpacing,
-            mVerticalSliderIDs
+            mYAxisInitialValue,
+            mSliderColorFilter,
+            sliderAlphaValue,
+            mThumbColorFilter
         )
-
-        mSliderComponent
-            .initParams(
-                this,
-                mNumberOfDataPoints,
-                mVerticalSliderIDs,
-                mSliderSpacing,
-                mYAxisInitialValue,
-                mSliderColorFilter,
-                sliderAlphaValue,
-                mThumbColorFilter,
-                mGradientColor
+        findViewById<FrameLayout>(R.id.polyline_slider_graph_frame_layout).addView(
+            mSliderComponent,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
             )
-
+        )
         mSliderComponent.post {
             mSliderComponent.initiatePostSequence()
-            mYAxis.setAdapterAndLayout(Y_AXIS_TYPE)
-
-            mXAxis.setAdapterAndLayout(X_AXIS_TYPE)
-        }
-    }
-
-    internal fun updateText(position: Int, code: Int) {
-        when (code) {
-            ON_TOUCH_UP -> {
-                try {
-                    findViewById<TextView>(mXAxisTextViewIDs[position]).typeface = Typeface.DEFAULT
-                } catch (e: Exception) {
-                    Log.e("Exception Class", "${e.message}")
-                }
-            }
-            ON_TOUCH_DOWN -> {
-                try {
-                    findViewById<TextView>(mXAxisTextViewIDs[position]).typeface =
-                        Typeface.DEFAULT_BOLD
-                } catch (e: Exception) {
-                    Log.e("Exception Class", "${e.message}")
-                }
-            }
-            else -> {
-                Log.e("Wut dis", "$code")
-            }
         }
     }
 
@@ -202,30 +214,5 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         } else {
             measuredWidth / numberOfPoints
         }
-    }
-
-    internal fun performViewScroll(scrollingValue: Int) {
-        mXAxis.scrollBy(scrollingValue, 0)
-        mYAxis.scrollBy(scrollingValue, 0)
-    }
-
-    internal fun changeYAxisProgress(position: Int, progress: Int) {
-        try {
-            findViewById<TextView>(mYAxisTextViewIDs[position]).text =
-                ((progress).toString() + mYAxisUnit)
-        } catch (e: Exception) {
-            Log.e("YAxisProgressError", e.message!!)
-        }
-    }
-
-    private fun updateLayout() {
-        mYAxis.updateLayout(mSliderSpacing)
-        mXAxis.updateLayout(mSliderSpacing)
-        mSliderComponent.updateLayout(mSliderSpacing)
-    }
-
-    internal fun getSliderProgressValue(position: Int): Int {
-        val mVerticalSlider = findViewById<VerticalSeekBarWrapper>(mVerticalSliderIDs[position])
-        return mVerticalSlider.sliderProgress
     }
 }

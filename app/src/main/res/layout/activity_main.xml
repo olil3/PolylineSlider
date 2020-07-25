@@ -17,6 +17,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="1.0"
-        app:number_of_data_points="12" />
+        app:number_of_data_points="12"
+        app:x_axis_unit="Unit"
+        app:y_axis_unit="%" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
