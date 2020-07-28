@@ -93,12 +93,16 @@ data class PolylineSliderProperties(
             useDefaultGradientColor = true
         }
 
-        mXAxisUnitArray = if (mXAxisValues == null) {
-            List(mNumberOfDataPoints) { position -> (position + 1).toString() }
-        } else if (mXAxisValues.size == mNumberOfDataPoints) {
-            mXAxisValues.asList()
-        } else {
-            throw(IllegalArgumentException("X Axis Values Array must have the same size as that of the number of data points! Expected:$mNumberOfDataPoints Found:${mXAxisValues.size}"))
+        mXAxisUnitArray = when {
+            mXAxisValues == null -> {
+                List(mNumberOfDataPoints) { position -> (position + 1).toString() }
+            }
+            mXAxisValues.size == mNumberOfDataPoints -> {
+                mXAxisValues.asList()
+            }
+            else -> {
+                throw(IllegalArgumentException("X Axis Values Array must have the same size as that of the number of data points! Expected:$mNumberOfDataPoints Found:${mXAxisValues.size}"))
+            }
         }
 
         if (mYAxisInitialValue > mYAxisMaxValue || mYAxisInitialValue < mYAxisMinValue) {

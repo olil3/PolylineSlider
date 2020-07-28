@@ -49,9 +49,9 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         var mXAxisUnit: String? = null
         var mXAxisValues: Array<String>? = null
         var mYAxisUnit: String? = null
-        var mYAxisMaxValue: Int = 100
-        var mYAxisMinValue: Int = 0
-        var mYAxisInitialValue: Int = 50
+        var mYAxisMaxValue = 100
+        var mYAxisMinValue = 0
+        var mYAxisInitialValue = 50
 
         if (attributeSet != null) {
             val attributes = mContext.obtainStyledAttributes(
