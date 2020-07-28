@@ -7,9 +7,10 @@
             <enum name="Yes" value="255" />
         </attr>
         <attr name="thumb_color" format="color" />
+        <attr name="slider_color" format="color" />
         <attr name="gradient_color" format="color" />
         <attr name="x_axis_unit" format="string" />
-        <attr name="custom_x_axis_units" format="boolean" />
+        <attr name="x_axis_custom_values" format="reference" />
         <attr name="y_axis_unit" format="string" />
         <attr name="y_axis_max_value" format="integer" />
         <attr name="y_axis_min_value" format="integer" />

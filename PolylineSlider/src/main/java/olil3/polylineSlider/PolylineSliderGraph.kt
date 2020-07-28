@@ -1,7 +1,6 @@
 package olil3.polylineSlider
 
 import android.content.Context
-import android.graphics.PorterDuffColorFilter
 import android.widget.RelativeLayout
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -10,16 +9,10 @@ import olil3.polylineSlider.utils.VerticalSeekBarWrapper
 
 internal class PolylineSliderGraph(
     mContext: Context,
+    private val mDataClass: PolylineSliderProperties,
     private var mPolylineSlider: PolylineSlider,
-    private val mNumberOfDataPoints: Int,
-    mXAxisUnit: String,
-    mYAxisUnit: String,
     mSliderWrapperID: IntArray,
-    private val mSliderSpacing: Int,
-    mSliderInitialVal: Int,
-    mSliderColorFilter: PorterDuffColorFilter,
-    mSliderAlphaVal: Int,
-    mThumbColorFilter: PorterDuffColorFilter
+    private val mSliderSpacing: Int
 ) : RecyclerView(mContext) {
 
     private lateinit var mInitialEPointF: EPointF
@@ -31,15 +24,9 @@ internal class PolylineSliderGraph(
         layoutManager = LinearLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
         adapter = PolylineSliderGraphAdapter(
             this,
-            mNumberOfDataPoints,
+            mDataClass,
             mSliderSpacing,
-            mSliderAlphaVal,
-            mSliderInitialVal,
-            mThumbColorFilter,
-            mSliderColorFilter,
             mSliderWrapperID,
-            mXAxisUnit,
-            mYAxisUnit,
             context
         )
         mPolylineSlider.invalidate()
@@ -53,18 +40,18 @@ internal class PolylineSliderGraph(
     }
 
     fun initiatePostSequence() {
-        mEPointFYVal = FloatArray(mNumberOfDataPoints)
-        mEPointFXVal = FloatArray(mNumberOfDataPoints)
+        mEPointFYVal = FloatArray(mDataClass.mNumberOfDataPoints)
+        mEPointFXVal = FloatArray(mDataClass.mNumberOfDataPoints)
         mInitialEPointF =
             ((this.getChildAt(0) as RelativeLayout).getChildAt(0) as VerticalSeekBarWrapper).getSliderCoordinates()
 
-        for (addBasePoints in 0 until mNumberOfDataPoints) {
+        for (addBasePoints in 0 until mDataClass.mNumberOfDataPoints) {
             mEPointFXVal[addBasePoints] = mInitialEPointF.x + (addBasePoints * mSliderSpacing)
             mEPointFYVal[addBasePoints] = mInitialEPointF.y
         }
 
         this.setOnScrollChangeListener { _, _, _, _, _ ->
-            for (updateBasePoints in 0 until mNumberOfDataPoints) {
+            for (updateBasePoints in 0 until mDataClass.mNumberOfDataPoints) {
                 mEPointFXVal[updateBasePoints] =
                     mInitialEPointF.x +
                         (updateBasePoints * mSliderSpacing) -

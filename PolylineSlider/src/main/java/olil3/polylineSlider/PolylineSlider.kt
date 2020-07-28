@@ -7,8 +7,6 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.PorterDuff
-import android.graphics.PorterDuffColorFilter
 import android.graphics.Rect
 import android.graphics.Shader
 import android.util.AttributeSet
@@ -20,36 +18,41 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import olil3.polylineSlider.utils.PolyBezierPathUtil
 
 class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
+    private var mDataClass: PolylineSliderProperties
+
     private lateinit var mSliderComponent: PolylineSliderGraph
 
-    private var mNumberOfDataPoints: Int = 1
     private var mSliderSpacing: Int = 0
     private val axisHeight: Float = context.resources.getDimension(R.dimen.axis_text_view_height)
-    private var mYAxisMaxValue: Int = 100
-    private var mYAxisMinValue: Int = 0
-    private var mYAxisInitialValue: Int = 50
-
-    private var mXAxisUnit: String = ""
-    private var mYAxisUnit: String = ""
 
     private var isUIInitialized: Boolean = false
     private var mVerticalSliderIDs: IntArray
 
-    private var sliderAlphaValue: Int = 0
-    private var mThumbColor: Int = 0
     private val mGradientPath: Path = Path()
     private val mGradientPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
-    private var mGradientColor: Int = Color.rgb(238, 130, 238)
 
     private val mBezierPathUtil: PolyBezierPathUtil = PolyBezierPathUtil()
     private val mPathPaint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
+    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0)
     constructor(mContext: Context, attributeSet: AttributeSet?, defStyleAttr: Int) : super(
         mContext,
         attributeSet,
         defStyleAttr
     ) {
         View.inflate(context, R.layout.polyline_slider, this)
+        var mNumberOfDataPoints = 1
+        var sliderAlphaValue = 0
+        var mThumbColor: Int? = null
+        var mSliderColor: Int? = null
+        var mGradientColor: Int? = null
+        var mXAxisUnit: String? = null
+        var mXAxisValues: Array<String>? = null
+        var mYAxisUnit: String? = null
+        var mYAxisMaxValue: Int = 100
+        var mYAxisMinValue: Int = 0
+        var mYAxisInitialValue: Int = 50
+
         if (attributeSet != null) {
             val attributes = mContext.obtainStyledAttributes(
                 attributeSet,
@@ -64,25 +67,31 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                     attributes.getInt(R.styleable.PolylineSlider_is_slider_track_visible, 0)
                 mThumbColor =
                     attributes.getInt(R.styleable.PolylineSlider_thumb_color, Color.MAGENTA)
+                mSliderColor =
+                    attributes.getInt(R.styleable.PolylineSlider_slider_color, Color.MAGENTA)
                 mGradientColor =
                     attributes.getColor(
                         R.styleable.PolylineSlider_gradient_color, Color.rgb(238, 130, 238)
                     )
-                mXAxisUnit = if (attributes.getString(R.styleable.PolylineSlider_x_axis_unit)
-                        .toString() == "null"
-                ) {
-                    ""
-                } else {
-                    attributes.getString(R.styleable.PolylineSlider_x_axis_unit).toString()
-                }
-
-                mYAxisUnit = if (attributes.getString(R.styleable.PolylineSlider_y_axis_unit)
-                        .toString() == "null"
-                ) {
-                    ""
-                } else {
-                    attributes.getString(R.styleable.PolylineSlider_y_axis_unit).toString()
-                }
+                mXAxisUnit =
+                    if (attributes.getString(R.styleable.PolylineSlider_x_axis_unit) == null) {
+                        ""
+                    } else {
+                        attributes.getString(R.styleable.PolylineSlider_x_axis_unit).toString()
+                    }
+                mXAxisValues =
+                    if (attributes.getTextArray(R.styleable.PolylineSlider_x_axis_custom_values) != null) {
+                        Array(attributes.getTextArray(R.styleable.PolylineSlider_x_axis_custom_values).size)
+                        { charSequence -> attributes.getTextArray(R.styleable.PolylineSlider_x_axis_custom_values)[charSequence].toString() }
+                    } else {
+                        null
+                    }
+                mYAxisUnit =
+                    if (attributes.getString(R.styleable.PolylineSlider_y_axis_unit) == null) {
+                        ""
+                    } else {
+                        attributes.getString(R.styleable.PolylineSlider_y_axis_unit).toString()
+                    }
                 mYAxisMaxValue = attributes.getInt(R.styleable.PolylineSlider_y_axis_max_value, 100)
                 mYAxisMinValue = attributes.getInt(R.styleable.PolylineSlider_y_axis_min_value, 0)
                 mYAxisInitialValue =
@@ -98,23 +107,38 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                 throw IllegalArgumentException(mContext.resources.getString(R.string.invalid_number_of_data_points))
             }
         }
+        mDataClass =
+            PolylineSliderProperties(
+                mNumberOfDataPoints,
+                sliderAlphaValue == 255,
+                mThumbColor,
+                mSliderColor,
+                mGradientColor,
+                mXAxisUnit,
+                mXAxisValues,
+                mYAxisUnit,
+                mYAxisMinValue,
+                mYAxisMaxValue,
+                mYAxisInitialValue
+            )
         mVerticalSliderIDs = IntArray(mNumberOfDataPoints)
     }
 
-    constructor(mContext: Context, attributeSet: AttributeSet?) : this(mContext, attributeSet, 0) {
-        // Do nothing.
-    }
-
-    constructor(mContext: Context) : this(mContext, null, 0) {
-        // Do nothing.
+    constructor(mContext: Context, mPolylineSliderProperties: PolylineSliderProperties) : super(
+        mContext,
+        null,
+        0
+    ) { // Inflate view
+        mDataClass = mPolylineSliderProperties
+        mVerticalSliderIDs = IntArray(mDataClass.mNumberOfDataPoints)
     }
 
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         super.onLayout(changed, left, top, right, bottom)
         if (changed) {
-            mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+            mSliderSpacing = getSliderSpacing(mDataClass.mNumberOfDataPoints)
             if (!isUIInitialized) {
-                mSliderSpacing = getSliderSpacing(mNumberOfDataPoints)
+                mSliderSpacing = getSliderSpacing(mDataClass.mNumberOfDataPoints)
                 objectInit()
                 isUIInitialized = true
             }
@@ -166,30 +190,22 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
     }
 
     private fun objectInit() {
-        val mThumbColorFilter = PorterDuffColorFilter(mThumbColor, PorterDuff.Mode.SRC_ATOP)
-        val mSliderColorFilter = PorterDuffColorFilter(Color.MAGENTA, PorterDuff.Mode.SRC_ATOP)
         mGradientPaint.shader = LinearGradient(
             0f,
             0f,
             0f,
             measuredHeight.toFloat(),
-            mGradientColor,
+            if (mDataClass.useDefaultGradientColor) mDataClass.DEFAULT_GRADIENT_COLOR else mDataClass.mGradientColor!!, // check boolean
             Color.TRANSPARENT,
             Shader.TileMode.MIRROR
         )
 
         mSliderComponent = PolylineSliderGraph(
             context,
+            mDataClass,
             this,
-            mNumberOfDataPoints,
-            mXAxisUnit,
-            mYAxisUnit,
             mVerticalSliderIDs,
-            mSliderSpacing,
-            mYAxisInitialValue,
-            mSliderColorFilter,
-            sliderAlphaValue,
-            mThumbColorFilter
+            mSliderSpacing
         )
         findViewById<FrameLayout>(R.id.polyline_slider_graph_frame_layout).addView(
             mSliderComponent,

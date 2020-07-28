@@ -1,7 +1,6 @@
 package olil3.polylineSlider
 
 import android.content.Context
-import android.graphics.PorterDuffColorFilter
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -14,27 +13,27 @@ import olil3.polylineSlider.utils.VerticalSeekBarWrapper
 
 internal class PolylineSliderGraphAdapter(
     private val mParentRecyclerView: PolylineSliderGraph,
-    private val mNumberOfDataPoints: Int,
+    private val mDataClass: PolylineSliderProperties,
     private val mSliderSpacing: Int,
-    private val mSliderAlphaVal: Int,
-    private val mSliderInitialVal: Int,
-    private val mThumbColorFilter: PorterDuffColorFilter,
-    private val mSliderColorFilter: PorterDuffColorFilter,
     private val mSliderWrapperIDArray: IntArray,
-    private val mXAxisUnit: String,
-    private var mYAxisUnit: String,
     private val mContext: Context
 ) :
     RecyclerView.Adapter<PolylineSliderGraphAdapter.VerticalSeekBarObject>() {
     override fun getItemCount(): Int {
-        return mNumberOfDataPoints
+        return mDataClass.mNumberOfDataPoints
     }
 
     override fun onBindViewHolder(holder: VerticalSeekBarObject, position: Int) {
         mSliderWrapperIDArray[position] = holder.mVerticalSliderComponent.id
         val mVerticalSliderSeekBar = holder.mVerticalSlider
-        holder.mXTextView.text = ("$position$mXAxisUnit")
-        holder.mYTextView.text = ("${mVerticalSliderSeekBar.childSeekBar.progress}$mYAxisUnit")
+        mVerticalSliderSeekBar.childSeekBar.thumb.colorFilter =
+            mDataClass.mThumbColorArray[position]
+        mVerticalSliderSeekBar.childSeekBar.progressDrawable.colorFilter =
+            mDataClass.mSliderColorArray[position]
+
+        holder.mXTextView.text = ("${mDataClass.mXAxisUnitArray[position]}${mDataClass.mXAxisUnit}")
+        holder.mYTextView.text =
+            ("${mVerticalSliderSeekBar.childSeekBar.progress}${mDataClass.mYAxisUnit}")
 
         mVerticalSliderSeekBar.childSeekBar
             .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -45,7 +44,7 @@ internal class PolylineSliderGraphAdapter(
                 ) {
                     mParentRecyclerView.updateSliderParams(mVerticalSliderSeekBar, position)
                     holder.mYTextView.text =
-                        ("${mVerticalSliderSeekBar.childSeekBar.progress}$mYAxisUnit")
+                        ("${mVerticalSliderSeekBar.childSeekBar.progress}${mDataClass.mYAxisUnit}")
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -67,11 +66,9 @@ internal class PolylineSliderGraphAdapter(
         mVerticalSliderItem.layoutParams =
             RecyclerView.LayoutParams(mSliderSpacing, RecyclerView.LayoutParams.MATCH_PARENT)
 
-        mVerticalSlider.sliderAlpha = mSliderAlphaVal
-        mVerticalSlider.thumbColor = mThumbColorFilter
-        mVerticalSlider.sliderColor = mSliderColorFilter
+        mVerticalSlider.sliderAlpha = if (mDataClass.isSliderVisible) 255 else 0
         mVerticalSlider.sliderMax = 100
-        mVerticalSlider.sliderProgress = mSliderInitialVal
+        mVerticalSlider.sliderProgress = mDataClass.mYAxisInitialValue
 
         mXAxis.gravity = Gravity.CENTER
         mYAxis.gravity = Gravity.CENTER
