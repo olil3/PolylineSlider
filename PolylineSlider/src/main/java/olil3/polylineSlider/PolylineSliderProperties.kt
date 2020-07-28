@@ -1,59 +1,108 @@
 package olil3.polylineSlider
 
 import android.graphics.Color
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 
 data class PolylineSliderProperties(
     val mNumberOfDataPoints: Int,
     val isSliderVisible: Boolean,
     val mThumbColor: Any?,
-    val mSliderColor: Any?,
+    private val mSliderColor: Any?,
     val mGradientColor: Int?,
     val mXAxisUnit: String?,
-    val mXAxisValues: Array<String>?,
+    private val mXAxisValues: Array<String>?,
     val mYAxisUnit: String?,
     val mYAxisMinValue: Int,
     val mYAxisMaxValue: Int,
     val mYAxisInitialValue: Int
 ) {
 
-    internal val DEFAULT_THUMB_COLOR = Color.MAGENTA
-    internal val DEFAULT_SLIDER_COLOR = Color.MAGENTA
     internal val DEFAULT_GRADIENT_COLOR = Color.rgb(238, 130, 238)
-
-    internal var usePositionOffsetAsXAxis: Boolean = false
-    internal var useDefaultThumbColor: Boolean = false
-    internal var useDefaultSliderColor: Boolean = false
     internal var useDefaultGradientColor: Boolean = false
 
+    internal val mXAxisUnitArray: List<String>
+    internal val mSliderColorArray: List<PorterDuffColorFilter>
+    internal val mThumbColorArray: List<PorterDuffColorFilter>
+
     init {
-        if (mThumbColor != null) {
+
+        mThumbColorArray = if (mThumbColor != null) {
             if (!(mThumbColor is Int || mThumbColor is IntArray)) {
                 throw(IllegalArgumentException("Thumb Color must either be an Int or an array of Ints!"))
+            } else if (mThumbColor is Int) {
+                List(mNumberOfDataPoints) {
+                    PorterDuffColorFilter(
+                        mThumbColor,
+                        PorterDuff.Mode.SRC_ATOP
+                    )
+                }
+            } else {
+                if ((mThumbColor as IntArray).size == mNumberOfDataPoints) {
+                    List(mNumberOfDataPoints) { position ->
+                        PorterDuffColorFilter(
+                            mThumbColor[position],
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                    }
+                } else {
+                    throw(IllegalArgumentException("Thumb Color Array must have the same size as that of the number of data points! Expected:$mNumberOfDataPoints Found:${mThumbColor.size}"))
+                }
             }
         } else {
-            useDefaultThumbColor = true
+            List(mNumberOfDataPoints) {
+                PorterDuffColorFilter(
+                    Color.MAGENTA,
+                    PorterDuff.Mode.SRC_ATOP
+                )
+            }
         }
 
-        if (mSliderColor != null) {
+        mSliderColorArray = if (mSliderColor != null) {
             if (!(mSliderColor is Int || mSliderColor is IntArray)) {
                 throw(IllegalArgumentException("Slider Color must either be an Int or an array of Ints!"))
+            } else if (mSliderColor is Int) {
+                List(mNumberOfDataPoints) {
+                    PorterDuffColorFilter(
+                        mSliderColor,
+                        PorterDuff.Mode.SRC_ATOP
+                    )
+                }
+            } else {
+                if ((mSliderColor as IntArray).size == mNumberOfDataPoints) {
+                    List(mNumberOfDataPoints) { position ->
+                        PorterDuffColorFilter(
+                            mSliderColor[position],
+                            PorterDuff.Mode.SRC_ATOP
+                        )
+                    }
+                } else {
+                    throw(IllegalArgumentException("Slider Color Array must have the same size as that of the number of data points! Expected:$mNumberOfDataPoints Found:${mSliderColor.size}"))
+                }
             }
         } else {
-            useDefaultSliderColor = true
+            List(mNumberOfDataPoints) {
+                PorterDuffColorFilter(
+                    Color.MAGENTA,
+                    PorterDuff.Mode.SRC_ATOP
+                )
+            }
         }
 
         if (mGradientColor == null) {
             useDefaultGradientColor = true
         }
 
-        if (mXAxisValues == null) {
-            usePositionOffsetAsXAxis = true
-        } else if (mXAxisValues.size != mNumberOfDataPoints) {
-            throw(IllegalArgumentException("X Axis Values Array must have the same size as that of the number of data points!"))
+        mXAxisUnitArray = if (mXAxisValues == null) {
+            List(mNumberOfDataPoints) { position -> (position + 1).toString() }
+        } else if (mXAxisValues.size == mNumberOfDataPoints) {
+            mXAxisValues.asList()
+        } else {
+            throw(IllegalArgumentException("X Axis Values Array must have the same size as that of the number of data points! Expected:$mNumberOfDataPoints Found:${mXAxisValues.size}"))
         }
 
         if (mYAxisInitialValue > mYAxisMaxValue || mYAxisInitialValue < mYAxisMinValue) {
-            throw(IllegalArgumentException("Y Axis Initial Value must lie within the inclusive bounds of the min and max values!"))
+            throw(IllegalArgumentException("Y Axis Initial Value must lie within the inclusive bounds of the min and max values! Min:$mYAxisMinValue Max:$mYAxisMinValue Initial:$mYAxisInitialValue"))
         }
     }
 
