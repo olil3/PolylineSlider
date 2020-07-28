@@ -26,9 +26,9 @@ internal class PolylineSliderGraphAdapter(
     override fun onBindViewHolder(holder: VerticalSeekBarObject, position: Int) {
         mSliderWrapperIDArray[position] = holder.mVerticalSliderComponent.id
         val mVerticalSliderSeekBar = holder.mVerticalSlider
-        mVerticalSliderSeekBar.childSeekBar.thumb.colorFilter =
+        mVerticalSliderSeekBar.thumbColor =
             mDataClass.mThumbColorArray[position]
-        mVerticalSliderSeekBar.childSeekBar.progressDrawable.colorFilter =
+        mVerticalSliderSeekBar.sliderColor =
             mDataClass.mSliderColorArray[position]
 
         holder.mXTextView.text = ("${mDataClass.mXAxisUnitArray[position]}${mDataClass.mXAxisUnit}")
