@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">PolylineSliderExample</string>
+    <string-array name="custom_x_axis_units">
+        <item>First</item>
+        <item>Second</item>
+        <item>Third</item>
+        <item>Fourth</item>
+        <item>Fifth</item>
+        <item>Sixth</item>
+    </string-array>
 </resources>
