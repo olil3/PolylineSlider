@@ -13,9 +13,9 @@ data class PolylineSliderProperties(
     val mXAxisUnit: String?,
     private val mXAxisValues: Array<String>?,
     val mYAxisUnit: String?,
-    val mYAxisMinValue: Int,
-    val mYAxisMaxValue: Int,
-    val mYAxisInitialValue: Int
+    val mYAxisMinValue: Float,
+    val mYAxisMaxValue: Float,
+    val mYAxisInitialValue: Float
 ) {
 
     internal val DEFAULT_GRADIENT_COLOR = Color.rgb(238, 130, 238)
@@ -141,9 +141,9 @@ data class PolylineSliderProperties(
         result = 31 * result + (mXAxisUnit?.hashCode() ?: 0)
         result = 31 * result + (mXAxisValues?.contentHashCode() ?: 0)
         result = 31 * result + (mYAxisUnit?.hashCode() ?: 0)
-        result = 31 * result + mYAxisMinValue
-        result = 31 * result + mYAxisMaxValue
-        result = 31 * result + mYAxisInitialValue
+        result = 31 * result + mYAxisMinValue.hashCode()
+        result = 31 * result + mYAxisMaxValue.hashCode()
+        result = 31 * result + mYAxisInitialValue.hashCode()
         return result
     }
 }

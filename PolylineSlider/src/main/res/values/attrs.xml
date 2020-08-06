@@ -12,9 +12,9 @@
         <attr name="x_axis_unit" format="string" />
         <attr name="x_axis_custom_values" format="reference" />
         <attr name="y_axis_unit" format="string" />
-        <attr name="y_axis_max_value" format="integer" />
-        <attr name="y_axis_min_value" format="integer" />
-        <attr name="y_axis_initial_value" format="integer" />
+        <attr name="y_axis_max_value" format="float" />
+        <attr name="y_axis_min_value" format="float" />
+        <attr name="y_axis_initial_value" format="float" />
     </declare-styleable>
 
     <!--

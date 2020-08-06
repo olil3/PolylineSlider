@@ -49,9 +49,9 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
         var mXAxisUnit: String? = null
         var mXAxisValues: Array<String>? = null
         var mYAxisUnit: String? = null
-        var mYAxisMaxValue = 100
-        var mYAxisMinValue = 0
-        var mYAxisInitialValue = 50
+        var mYAxisMaxValue = 100f
+        var mYAxisMinValue = 0f
+        var mYAxisInitialValue = 50f
 
         if (attributeSet != null) {
             val attributes = mContext.obtainStyledAttributes(
@@ -92,10 +92,12 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
                     } else {
                         attributes.getString(R.styleable.PolylineSlider_y_axis_unit).toString()
                     }
-                mYAxisMaxValue = attributes.getInt(R.styleable.PolylineSlider_y_axis_max_value, 100)
-                mYAxisMinValue = attributes.getInt(R.styleable.PolylineSlider_y_axis_min_value, 0)
+                mYAxisMaxValue =
+                    attributes.getFloat(R.styleable.PolylineSlider_y_axis_max_value, 100f)
+                mYAxisMinValue =
+                    attributes.getFloat(R.styleable.PolylineSlider_y_axis_min_value, 0f)
                 mYAxisInitialValue =
-                    attributes.getInt(R.styleable.PolylineSlider_y_axis_initial_value, 50)
+                    attributes.getFloat(R.styleable.PolylineSlider_y_axis_initial_value, 50f)
             } catch (error: Exception) {
                 Log.e("PolylineSlider init err", error.message!!)
                 throw error
