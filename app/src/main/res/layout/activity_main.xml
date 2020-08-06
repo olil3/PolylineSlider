@@ -20,6 +20,9 @@
         app:number_of_data_points="6"
         app:x_axis_custom_values="@array/custom_x_axis_units"
         app:x_axis_unit=" Unit"
+        app:y_axis_initial_value="0"
+        app:y_axis_max_value="7.5"
+        app:y_axis_min_value="-7.5"
         app:y_axis_unit="%" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

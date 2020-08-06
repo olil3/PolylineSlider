@@ -33,7 +33,7 @@ internal class PolylineSliderGraphAdapter(
 
         holder.mXTextView.text = ("${mDataClass.mXAxisUnitArray[position]}${mDataClass.mXAxisUnit}")
         holder.mYTextView.text =
-            ("${mVerticalSliderSeekBar.childSeekBar.progress}${mDataClass.mYAxisUnit}")
+            ("${getYAxisTextValue(mVerticalSliderSeekBar.childSeekBar.progress)}${mDataClass.mYAxisUnit}")
 
         mVerticalSliderSeekBar.childSeekBar
             .setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
@@ -44,7 +44,7 @@ internal class PolylineSliderGraphAdapter(
                 ) {
                     mParentRecyclerView.updateSliderParams(mVerticalSliderSeekBar, position)
                     holder.mYTextView.text =
-                        ("${mVerticalSliderSeekBar.childSeekBar.progress}${mDataClass.mYAxisUnit}")
+                        ("${getYAxisTextValue(mVerticalSliderSeekBar.childSeekBar.progress)}${mDataClass.mYAxisUnit}")
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -68,7 +68,7 @@ internal class PolylineSliderGraphAdapter(
 
         mVerticalSlider.sliderAlpha = if (mDataClass.isSliderVisible) 255 else 0
         mVerticalSlider.sliderMax = 100
-        mVerticalSlider.sliderProgress = mDataClass.mYAxisInitialValue
+        mVerticalSlider.sliderProgress = getSliderProgressFromValue(mDataClass.mYAxisInitialValue)
 
         mXAxis.gravity = Gravity.CENTER
         mYAxis.gravity = Gravity.CENTER
@@ -90,5 +90,13 @@ internal class PolylineSliderGraphAdapter(
         val mVerticalSlider = mVerticalSliderComponent.getChildAt(0) as VerticalSeekBarWrapper
         val mXTextView = mVerticalSliderComponent.getChildAt(1) as TextView
         val mYTextView = mVerticalSliderComponent.getChildAt(2) as TextView
+    }
+
+    private fun getYAxisTextValue(sliderProgress: Int): String {
+        return "%.2f".format((mDataClass.mYAxisMinValue + ((mDataClass.mYAxisMaxValue - mDataClass.mYAxisMinValue) * sliderProgress / 100)))
+    }
+
+    private fun getSliderProgressFromValue(mValue: Float): Int {
+        return (((mValue - mDataClass.mYAxisMinValue) / (mDataClass.mYAxisMaxValue - mDataClass.mYAxisMinValue)) * 100f).toInt()
     }
 }
