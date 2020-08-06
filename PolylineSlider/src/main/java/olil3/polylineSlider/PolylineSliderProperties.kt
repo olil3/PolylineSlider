@@ -137,13 +137,19 @@ data class PolylineSliderProperties(
         var result = mNumberOfDataPoints
         result = 31 * result + isSliderVisible.hashCode()
         result = 31 * result + (mThumbColor?.hashCode() ?: 0)
-        result = 31 * result + (mGradientColor?.hashCode() ?: 0)
+        result = 31 * result + (mSliderColor?.hashCode() ?: 0)
+        result = 31 * result + (mGradientColor ?: 0)
         result = 31 * result + (mXAxisUnit?.hashCode() ?: 0)
         result = 31 * result + (mXAxisValues?.contentHashCode() ?: 0)
         result = 31 * result + (mYAxisUnit?.hashCode() ?: 0)
         result = 31 * result + mYAxisMinValue.hashCode()
         result = 31 * result + mYAxisMaxValue.hashCode()
         result = 31 * result + mYAxisInitialValue.hashCode()
+        result = 31 * result + DEFAULT_GRADIENT_COLOR
+        result = 31 * result + useDefaultGradientColor.hashCode()
+        result = 31 * result + mXAxisUnitArray.hashCode()
+        result = 31 * result + mSliderColorArray.hashCode()
+        result = 31 * result + mThumbColorArray.hashCode()
         return result
     }
 }
