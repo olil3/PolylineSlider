@@ -10,6 +10,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="300dp"
+        android:id="@+id/mPolylineSlider"
         app:is_slider_track_visible="Yes"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,5 +25,29 @@
         app:y_axis_max_value="7.5"
         app:y_axis_min_value="-7.5"
         app:y_axis_unit="%" />
+
+    <Button
+        android:id="@+id/getPercentageMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="99dp"
+        android:layout_marginBottom="153dp"
+        android:text="Percentage Map"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mPolylineSlider" />
+
+    <Button
+        android:id="@+id/getValueMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="99dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="153dp"
+        android:text="Value Map"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mPolylineSlider" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
