@@ -19,8 +19,34 @@ internal class PolylineSliderGraphAdapter(
     private val mContext: Context
 ) :
     RecyclerView.Adapter<PolylineSliderGraphAdapter.VerticalSeekBarObject>() {
-    override fun getItemCount(): Int {
-        return mDataClass.mNumberOfDataPoints
+
+    class VerticalSeekBarObject(val mVerticalSliderComponent: RelativeLayout) :
+        RecyclerView.ViewHolder(mVerticalSliderComponent) {
+        val mVerticalSlider = mVerticalSliderComponent.getChildAt(0) as VerticalSeekBarWrapper
+        val mXTextView = mVerticalSliderComponent.getChildAt(1) as TextView
+        val mYTextView = mVerticalSliderComponent.getChildAt(2) as TextView
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerticalSeekBarObject {
+        val mVerticalSliderItem = LayoutInflater.from(mContext)
+            .inflate(R.layout.vertical_slider_item, parent, false) as RelativeLayout
+        val mVerticalSlider = mVerticalSliderItem.findViewById<VerticalSeekBarWrapper>(R.id.slider)
+        val mXAxis = mVerticalSliderItem.findViewById<TextView>(R.id.x_axis_text)
+        val mYAxis = mVerticalSliderItem.findViewById<TextView>(R.id.y_axis_text)
+
+        mVerticalSliderItem.id = View.generateViewId()
+        mVerticalSliderItem.layoutParams =
+            RecyclerView.LayoutParams(mSliderSpacing, RecyclerView.LayoutParams.MATCH_PARENT)
+
+        mVerticalSlider.sliderAlpha = if (mDataClass.isSliderVisible) 255 else 0
+        mVerticalSlider.sliderMax = 100
+        mVerticalSlider.sliderProgress = getSliderProgressFromValue(mDataClass.mYAxisInitialValue)
+
+        mXAxis.gravity = Gravity.CENTER
+        mYAxis.gravity = Gravity.CENTER
+        return (VerticalSeekBarObject(
+            mVerticalSliderItem
+        ))
     }
 
     override fun onBindViewHolder(holder: VerticalSeekBarObject, position: Int) {
@@ -55,26 +81,8 @@ internal class PolylineSliderGraphAdapter(
             })
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VerticalSeekBarObject {
-        val mVerticalSliderItem = LayoutInflater.from(mContext)
-            .inflate(R.layout.vertical_slider_item, parent, false) as RelativeLayout
-        val mVerticalSlider = mVerticalSliderItem.findViewById<VerticalSeekBarWrapper>(R.id.slider)
-        val mXAxis = mVerticalSliderItem.findViewById<TextView>(R.id.x_axis_text)
-        val mYAxis = mVerticalSliderItem.findViewById<TextView>(R.id.y_axis_text)
-
-        mVerticalSliderItem.id = View.generateViewId()
-        mVerticalSliderItem.layoutParams =
-            RecyclerView.LayoutParams(mSliderSpacing, RecyclerView.LayoutParams.MATCH_PARENT)
-
-        mVerticalSlider.sliderAlpha = if (mDataClass.isSliderVisible) 255 else 0
-        mVerticalSlider.sliderMax = 100
-        mVerticalSlider.sliderProgress = getSliderProgressFromValue(mDataClass.mYAxisInitialValue)
-
-        mXAxis.gravity = Gravity.CENTER
-        mYAxis.gravity = Gravity.CENTER
-        return (VerticalSeekBarObject(
-            mVerticalSliderItem
-        ))
+    override fun getItemCount(): Int {
+        return mDataClass.mNumberOfDataPoints
     }
 
     override fun getItemId(position: Int): Long {
@@ -85,12 +93,6 @@ internal class PolylineSliderGraphAdapter(
         return position
     }
 
-    class VerticalSeekBarObject(val mVerticalSliderComponent: RelativeLayout) :
-        RecyclerView.ViewHolder(mVerticalSliderComponent) {
-        val mVerticalSlider = mVerticalSliderComponent.getChildAt(0) as VerticalSeekBarWrapper
-        val mXTextView = mVerticalSliderComponent.getChildAt(1) as TextView
-        val mYTextView = mVerticalSliderComponent.getChildAt(2) as TextView
-    }
 
     private fun getYAxisTextValue(sliderProgress: Int): String {
         return "%.2f".format((mDataClass.mYAxisMinValue + ((mDataClass.mYAxisMaxValue - mDataClass.mYAxisMinValue) * sliderProgress / 100)))
