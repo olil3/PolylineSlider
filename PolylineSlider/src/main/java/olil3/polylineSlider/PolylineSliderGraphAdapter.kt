@@ -10,6 +10,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import olil3.polylineSlider.utils.VerticalSeekBarWrapper
+import java.util.concurrent.ConcurrentHashMap
 
 internal class PolylineSliderGraphAdapter(
     private val mParentRecyclerView: PolylineSliderGraph,
@@ -19,6 +20,8 @@ internal class PolylineSliderGraphAdapter(
     private val mContext: Context
 ) :
     RecyclerView.Adapter<PolylineSliderGraphAdapter.VerticalSeekBarObject>() {
+
+    private val mProgressMap: ConcurrentHashMap<String, Int> = ConcurrentHashMap()
 
     class VerticalSeekBarObject(val mVerticalSliderComponent: RelativeLayout) :
         RecyclerView.ViewHolder(mVerticalSliderComponent) {
@@ -57,6 +60,8 @@ internal class PolylineSliderGraphAdapter(
         mVerticalSliderSeekBar.sliderColor =
             mDataClass.mSliderColorArray[position]
 
+        mProgressMap[mDataClass.mXAxisUnitArray[position]] = mVerticalSliderSeekBar.sliderProgress
+
         holder.mXTextView.text = ("${mDataClass.mXAxisUnitArray[position]}${mDataClass.mXAxisUnit}")
         holder.mYTextView.text =
             ("${getYAxisTextValue(mVerticalSliderSeekBar.childSeekBar.progress)}${mDataClass.mYAxisUnit}")
@@ -71,6 +76,8 @@ internal class PolylineSliderGraphAdapter(
                     mParentRecyclerView.updateSliderParams(mVerticalSliderSeekBar, position)
                     holder.mYTextView.text =
                         ("${getYAxisTextValue(mVerticalSliderSeekBar.childSeekBar.progress)}${mDataClass.mYAxisUnit}")
+                    mProgressMap[mDataClass.mXAxisUnitArray[position]] =
+                        mVerticalSliderSeekBar.sliderProgress
                 }
 
                 override fun onStartTrackingTouch(seekBar: SeekBar?) {
@@ -93,12 +100,24 @@ internal class PolylineSliderGraphAdapter(
         return position
     }
 
-
     private fun getYAxisTextValue(sliderProgress: Int): String {
         return "%.2f".format((mDataClass.mYAxisMinValue + ((mDataClass.mYAxisMaxValue - mDataClass.mYAxisMinValue) * sliderProgress / 100)))
     }
 
     private fun getSliderProgressFromValue(mValue: Float): Int {
         return (((mValue - mDataClass.mYAxisMinValue) / (mDataClass.mYAxisMaxValue - mDataClass.mYAxisMinValue)) * 100f).toInt()
+    }
+
+    fun getSliderProgressAsPercentage(): MutableMap<String, Int> {
+        return mProgressMap.toMutableMap()
+    }
+
+    fun getSliderProgressAsValue(): MutableMap<String, Float> {
+        val toReturn = mutableMapOf<String, Float>()
+        for (iterator in mProgressMap.entries) {
+            toReturn[iterator.key] =
+                (mDataClass.mYAxisMinValue + ((mDataClass.mYAxisMaxValue - mDataClass.mYAxisMinValue) * iterator.value / 100))
+        }
+        return toReturn
     }
 }

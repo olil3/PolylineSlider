@@ -233,4 +233,12 @@ class PolylineSlider : ConstraintLayout { // Todo: Add save state functionality
             measuredWidth / numberOfPoints
         }
     }
+
+    fun getSliderProgressAsPercentage(): MutableMap<String, Int> {
+        return mSliderComponent.getSliderProgressAsPercentage()
+    }
+
+    fun getSliderProgressAsValue(): MutableMap<String, Float> {
+        return mSliderComponent.getSliderProgressAsValue()
+    }
 }

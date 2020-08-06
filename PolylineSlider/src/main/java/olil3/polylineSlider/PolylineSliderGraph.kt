@@ -91,4 +91,12 @@ internal class PolylineSliderGraph(
     fun getInitialEPointF(): EPointF {
         return mInitialEPointF
     }
+
+    fun getSliderProgressAsPercentage(): MutableMap<String, Int> {
+        return (this.adapter as PolylineSliderGraphAdapter).getSliderProgressAsPercentage()
+    }
+
+    fun getSliderProgressAsValue(): MutableMap<String, Float> {
+        return (this.adapter as PolylineSliderGraphAdapter).getSliderProgressAsValue()
+    }
 }
