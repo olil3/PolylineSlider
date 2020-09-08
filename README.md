@@ -9,6 +9,7 @@ To be added in the coming weeks.
 - Ability to change the color of the sliders and their thumbs
 - Ability to hide slider track
 - Obtaining real-time changes in the positions of the thumbs using listeners [WIP]
+- Many more incoming!
 
 # Images and GIFs
 The following depict how the libarary will look and how one can interact with it. (More screenshots will be added soon!)
